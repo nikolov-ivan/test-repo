@@ -1,55 +1,43 @@
 
 
-Implement the smallest safe production integration
-for the existing TestNG lifecycle adapter.
+Choose option A: ServiceLoader.
 
-Goal:
-Ensure the adapter is initialized and registered
-exactly once during normal TestNG execution.
-
-First inspect the existing bootstrap and listener
-registration mechanisms.
+Use the official TestNG ServiceLoader mechanism.
 
 Requirements:
 
-1. Prefer reusing the existing listener registration
-   mechanism over introducing automatic discovery.
+1. Keep the core module independent of TestNG.
 
-2. The adapter must be available before the first
-   relevant TestNG lifecycle callback.
+2. Implement a no-argument constructor that
+   initializes the required lifecycle components.
 
-3. Reuse the existing lifecycle coordinator,
-   context registry and invocation tracker.
+3. Do not introduce a JVM-wide static singleton.
 
-4. Do not create separate coordinator instances
-   for different callbacks of the same execution.
+4. Ensure callbacks for all <test> elements
+   within one TestNG execution use the same
+   adapter instance and shared lifecycle state.
 
-5. Prevent duplicate listener registration and
-   duplicate context activation.
+5. Preserve isolation between separate TestNG
+   executions in the same JVM.
 
-6. Preserve existing legacy listeners unchanged.
+6. Prevent duplicate registration when tests
+   also register the adapter programmatically.
 
-7. Do not modify the existing configuration API.
+7. Do not migrate existing legacy listeners.
 
-8. Do not introduce TestNG dependencies into core.
+8. Do not modify existing configuration behavior.
 
-9. Do not introduce new abstractions unless
-   absolutely necessary.
+Before enabling automatic registration globally,
+create an isolated integration test with:
 
-10. Preserve isolation between separate executions
-    and parallel test invocations.
+- One suite containing two <test> elements.
+- Parallel test execution.
+- Separate configuration contexts.
+- Verification of adapter identity.
+- Verification of final context cleanup.
 
-Add one real integration test verifying:
-- Normal TestNG registration.
-- Single adapter initialization.
-- Correct context activation during @BeforeSuite.
-- Correct context activation during @Test.
-- Final cleanup after execution.
+First report whether the tests demonstrate
+the required instance-sharing behavior.
 
-If the current registration mechanism cannot
-satisfy these requirements, report the exact
-architectural blocker before implementing
-an alternative.
-
-Do not migrate screenshot or reporting listeners yet.
-Keep changes minimal and focused.
+Do not enable global registration until these
+checks pass.
