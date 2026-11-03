@@ -1,0 +1,24 @@
+
+Add one real TestNG 7.12.0 integration test to
+TestNgLifecycleListenerTest.
+
+Reuse GroupFilteredTeardownFixture if possible.
+
+Use the actual TestNgLifecycleListener.
+
+Verify:
+
+1. @BeforeMethod and @Test execute.
+2. Only the group-applicable @AfterMethod executes.
+3. All executed methods see the same INVOCATION UUID.
+4. The INVOCATION context is released after the
+   last actually invoked teardown.
+5. TestNgInvocationContextTracker is empty afterward.
+6. A subsequent test on the same thread gets a
+   fresh INVOCATION context.
+7. No orphan configuration layers remain.
+
+Do not modify production code.
+Do not weaken assertions.
+Report the exact failing assertions and the
+actual number returned by getAfterTestMethods().
