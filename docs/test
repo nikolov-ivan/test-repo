@@ -1,24 +1,37 @@
 
-Add one real TestNG 7.12.0 integration test to
-TestNgLifecycleListenerTest.
-
-Reuse GroupFilteredTeardownFixture if possible.
-
-Use the actual TestNgLifecycleListener.
-
-Verify:
-
-1. @BeforeMethod and @Test execute.
-2. Only the group-applicable @AfterMethod executes.
-3. All executed methods see the same INVOCATION UUID.
-4. The INVOCATION context is released after the
-   last actually invoked teardown.
-5. TestNgInvocationContextTracker is empty afterward.
-6. A subsequent test on the same thread gets a
-   fresh INVOCATION context.
-7. No orphan configuration layers remain.
+Investigate TestNG 7.12.0 lifecycle completion
+for a single test invocation.
 
 Do not modify production code.
-Do not weaken assertions.
-Report the exact failing assertions and the
-actual number returned by getAfterTestMethods().
+
+Inspect the TestNG 7.12.0 API and source code.
+
+Create a small real TestNG probe that records callbacks
+from:
+- IInvokedMethodListener
+- IConfigurationListener
+- ITestListener
+- IClassListener
+
+Run three scenarios:
+1. Two @AfterMethod methods.
+2. Two declared @AfterMethod methods, one filtered
+   through onlyForGroups.
+3. Two consecutive test invocations on the same thread.
+
+Determine:
+
+A. Is there a reliable callback AFTER all applicable
+   @AfterMethod methods for ONE test invocation?
+
+B. Can this callback distinguish consecutive test
+   invocations of the same method and class?
+
+C. Does it remain reliable with skipped configurations?
+
+D. If no such callback exists, identify the safest
+   invocation-boundary cleanup strategy.
+
+Report findings with exact callback sequences.
+Do not implement a production fix yet.
+
