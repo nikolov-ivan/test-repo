@@ -1,50 +1,37 @@
 
-
-
-
-
-
-
-
-Update only the existing real TestNG 7.12.0
-integration test where an independent ITestListener
-attempts to read invocation-scoped configuration.
-
-The current architecture guarantees an active
-INVOCATION context for coordinator-managed callbacks,
-not for independently registered TestNG listeners.
+Run a complete regression verification of the
+TestNG module after the recent lifecycle test updates.
 
 Requirements:
 
-1. Preserve the independent ITestListener.
+1. Execute the complete module test suite 3 times.
 
-2. Verify its onTestSuccess receives the correct
-   INVOCATION UUID through ITestResult attributes.
+2. Report for each run:
+   - Total tests
+   - Passed
+   - Failed
+   - Skipped
 
-3. Verify the independent listener does not
-   automatically receive an active ScopeCursor binding.
+3. List every remaining failing test with
+   its exact failure message.
 
-4. Add or reuse a coordinator-managed onTestSuccess
-   callback in the same integration test.
+4. Identify failures that occur intermittently.
 
-5. Verify the managed callback receives the correct
-   active INVOCATION UUID.
+5. Pay special attention to unintended execution
+   of nested fixture classes by Maven Surefire.
 
-6. Verify it reads the override created by
-   the test body through the normal configuration API.
+6. Verify that the integration tests for:
+   - Deferred invocation cleanup
+   - Multiple teardown methods
+   - Group-filtered teardown
+   - Parallel DataProvider
+   - Retry
+   - Managed callback activation
+   remain stable.
 
-7. Verify temporary activation cleanup.
+7. Do not modify production code.
+8. Do not modify tests.
+9. Do not change Maven configuration.
 
-8. Verify the invocation is released after
-   the owning TestNG context finishes.
-
-9. Do not depend on the callback registration order
-   of independent listeners.
-
-10. Do not modify production code or other tests.
-
-11. Do not weaken UUID, configuration isolation
-    or lifecycle safety assertions.
-
-Run only this integration test and report
-the exact result.
+Report the results and recommend only the
+smallest next corrective action.
