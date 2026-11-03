@@ -1,37 +1,34 @@
 
-Run a complete regression verification of the
-TestNG module after the recent lifecycle test updates.
 
-Requirements:
+Investigate the Maven Surefire test discovery issue.
 
-1. Execute the complete module test suite 3 times.
+The complete regression run sometimes executes
+nested fixture classes as independent tests.
 
-2. Report for each run:
-   - Total tests
-   - Passed
-   - Failed
-   - Skipped
+Important:
+The Surefire -Dtest parameter overrides configured
+includes and excludes.
 
-3. List every remaining failing test with
-   its exact failure message.
+Tasks:
 
-4. Identify failures that occur intermittently.
+1. Inspect the current Surefire configuration
+   and the exact Maven command used for regression.
 
-5. Pay special attention to unintended execution
-   of nested fixture classes by Maven Surefire.
+2. Determine whether -Dtest causes nested fixture
+   classes to be selected independently.
 
-6. Verify that the integration tests for:
-   - Deferred invocation cleanup
-   - Multiple teardown methods
-   - Group-filtered teardown
-   - Parallel DataProvider
-   - Retry
-   - Managed callback activation
-   remain stable.
+3. Compare test discovery with and without
+   the -Dtest parameter.
 
-7. Do not modify production code.
-8. Do not modify tests.
-9. Do not change Maven configuration.
+4. Identify the smallest reliable way to execute
+   only the intended top-level test classes.
 
-Report the results and recommend only the
-smallest next corrective action.
+5. Ensure nested fixtures remain usable when
+   launched programmatically by integration tests.
+
+6. Do not modify production code or test logic.
+
+7. Do not blindly add exclusion patterns to pom.xml.
+
+8. Report the findings and recommend the smallest
+   necessary change before implementing it.
