@@ -1,34 +1,43 @@
 
 
-Focus only on the two existing real TestNG
-integration tests involving:
 
-1. Two @AfterMethod methods.
-2. A group-filtered @AfterMethod.
+Analyze the remaining failing tests in the
+TestNG module after the deferred cleanup changes.
 
-Inspect how their test harness registers and
-forwards lifecycle callbacks.
+Do not modify any code yet.
 
-The production listener now implements both
-IInvokedMethodListener and ITestListener.
+Tasks:
 
-Requirements:
+1. Run the complete module test suite 3 times.
+2. Collect the exact names of failing tests.
+3. Record the failure message for each test.
+4. Compare failures across all 3 runs.
+5. Classify each failure into:
 
-- Ensure the same listener instance receives
-  both callback interfaces during real TestNG runs.
-- Preserve all lifecycle event observations.
-- Do not create duplicate listener instances.
-- Verify that all applicable teardown methods
-  share the same INVOCATION UUID.
-- Verify the remaining invocation is released
-  when the owning TestNG test context finishes.
-- Verify the tracker and registry are clean
-  after the TestNG run.
-- Do not require immediate cleanup after teardown.
-- Do not modify production code.
-- Do not modify unrelated tests.
-- Do not weaken UUID or configuration assertions.
+   A. Obsolete assertion expecting immediate cleanup.
+   B. Obsolete behavior no longer supported.
+   C. Test harness or listener registration problem.
+   D. Actual production defect.
+   E. Intermittent or concurrency-related failure.
 
-Run only these two integration tests.
+6. Pay special attention to:
+   - Context switching between different classes.
+   - Active invocation safety.
+   - Registry cleanup.
+   - ThreadLocal cleanup.
+   - Parallel execution isolation.
 
-Report the exact results and any remaining failures.
+7. Do not assume that every failure is caused
+   by an outdated assertion.
+
+8. Do not modify or disable tests.
+9. Do not modify production code.
+
+Return a concise table containing:
+- Test name
+- Failure reason
+- Classification
+- Recommended action
+
+Report the total number of tests and failures
+for each execution.
