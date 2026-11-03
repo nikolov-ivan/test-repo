@@ -2,41 +2,44 @@
 
 
 
+
 Update only the existing unit test that verifies
-a full test invocation with one @BeforeMethod,
-one @Test and one @AfterMethod.
+two sequential test invocations receive distinct
+configuration contexts.
 
 The implementation now uses deferred cleanup.
 
 Requirements:
 
-1. Verify all three methods use the same
-   INVOCATION context UUID.
+1. Verify the first invocation receives UUID-A.
 
-2. Verify temporary activations are closed
-   after each method callback.
+2. Verify its context remains registered after
+   the test method finishes.
 
-3. Verify the context remains registered
-   after the @AfterMethod callback.
+3. Start a second distinct logical invocation
+   using the existing test infrastructure.
 
-4. Verify the invocation tracker still tracks
-   this context until scope completion.
+4. Verify UUID-A is released when the second
+   invocation begins.
 
-5. Simulate onFinish() using the existing
-   listener test infrastructure.
+5. Verify the second invocation receives UUID-B
+   and UUID-A != UUID-B.
 
-6. Verify the invocation is released after
-   onFinish().
+6. Verify no configuration values or overrides
+   leak from the first invocation into the second.
 
-7. Verify the tracker is empty, the cursor
-   is clean and no orphan invocation layers
-   remain.
+7. Verify UUID-B remains registered until
+   the owning TestNG context finishes.
 
-8. Do not modify production code.
+8. Simulate onFinish() and verify UUID-B is
+   released afterward.
 
-9. Do not modify other tests.
+9. Verify the tracker, cursor and invocation
+   layers are clean after completion.
 
-10. Preserve all existing UUID, configuration
-    isolation and lifecycle safety assertions.
+10. Do not modify production code or other tests.
 
-Run only this test and report the result.
+11. Preserve all meaningful isolation,
+    lifecycle and UUID assertions.
+
+Run only the updated test and report the result.
