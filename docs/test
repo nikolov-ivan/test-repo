@@ -1,34 +1,31 @@
 
+Review the existing listener architecture and
+identify the next smallest integration step.
 
-Investigate the Maven Surefire test discovery issue.
+Goals:
+- Centralized listener coordination.
+- Framework-independent core.
+- Correct configuration context for every
+  managed lifecycle callback.
+- Deterministic listener execution ordering.
 
-The complete regression run sometimes executes
-nested fixture classes as independent tests.
+Inspect:
+1. Existing TestNG lifecycle adapter.
+2. Existing core lifecycle coordinator.
+3. Managed callback interface.
+4. Current listener registration mechanisms.
+5. Screenshot, reporting and logging listeners.
+6. Existing ServiceLoader registrations.
 
-Important:
-The Surefire -Dtest parameter overrides configured
-includes and excludes.
+Report:
+- Which components are already implemented.
+- Which listeners still depend directly on TestNG.
+- How listener ordering is currently controlled.
+- The smallest safe next implementation step.
+- Any compatibility or concurrency risks.
 
-Tasks:
+Do not modify any code yet.
+Do not create new abstractions yet.
+Do not propose rewriting working components.
 
-1. Inspect the current Surefire configuration
-   and the exact Maven command used for regression.
-
-2. Determine whether -Dtest causes nested fixture
-   classes to be selected independently.
-
-3. Compare test discovery with and without
-   the -Dtest parameter.
-
-4. Identify the smallest reliable way to execute
-   only the intended top-level test classes.
-
-5. Ensure nested fixtures remain usable when
-   launched programmatically by integration tests.
-
-6. Do not modify production code or test logic.
-
-7. Do not blindly add exclusion patterns to pom.xml.
-
-8. Report the findings and recommend the smallest
-   necessary change before implementing it.
+Keep the review concise and focused.
