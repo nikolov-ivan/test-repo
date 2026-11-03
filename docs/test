@@ -1,37 +1,42 @@
 
 
 
+
 Update only the existing unit test that verifies
-INVOCATION cleanup when no @AfterMethod exists.
+a full test invocation with one @BeforeMethod,
+one @Test and one @AfterMethod.
 
 The implementation now uses deferred cleanup.
 
 Requirements:
 
-1. Do not expect the invocation context to be
-   released immediately after afterInvocation(TEST).
+1. Verify all three methods use the same
+   INVOCATION context UUID.
 
-2. Verify the temporary activation is closed.
+2. Verify temporary activations are closed
+   after each method callback.
 
-3. Verify the INVOCATION context remains registered
-   and available for managed result callbacks.
+3. Verify the context remains registered
+   after the @AfterMethod callback.
 
-4. Simulate the owning TestNG context finishing
-   using the existing lifecycle test infrastructure.
+4. Verify the invocation tracker still tracks
+   this context until scope completion.
 
-5. Verify the invocation is released afterward.
+5. Simulate onFinish() using the existing
+   listener test infrastructure.
 
-6. Verify the tracker has no remaining open
-   invocations.
+6. Verify the invocation is released after
+   onFinish().
 
-7. Verify no orphan invocation layers remain.
+7. Verify the tracker is empty, the cursor
+   is clean and no orphan invocation layers
+   remain.
 
 8. Do not modify production code.
 
-9. Do not modify any other tests.
+9. Do not modify other tests.
 
-10. Preserve all meaningful isolation and
-    lifecycle safety assertions.
+10. Preserve all existing UUID, configuration
+    isolation and lifecycle safety assertions.
 
-Run this test and report the result.
-
+Run only this test and report the result.
