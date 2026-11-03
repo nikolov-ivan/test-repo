@@ -1,37 +1,23 @@
 
-Investigate TestNG 7.12.0 lifecycle completion
-for a single test invocation.
+Add one real TestNG 7.12.0 integration test to
+TestNgLifecycleListenerTest.
+
+Use the actual TestNgLifecycleListener.
+
+Add a second listener implementing ITestListener.
+
+In onTestSuccess(), attempt to read an
+INVOCATION-scoped configuration value through
+the normal configuration API.
+
+Verify:
+1. @BeforeMethod sets an invocation-specific override.
+2. The @Test body reads the overridden value.
+3. The ITestListener.onTestSuccess callback reads
+   the same overridden value.
+4. It resolves to the same INVOCATION UUID.
+5. The callback does not fall back to ROOT configuration.
 
 Do not modify production code.
-
-Inspect the TestNG 7.12.0 API and source code.
-
-Create a small real TestNG probe that records callbacks
-from:
-- IInvokedMethodListener
-- IConfigurationListener
-- ITestListener
-- IClassListener
-
-Run three scenarios:
-1. Two @AfterMethod methods.
-2. Two declared @AfterMethod methods, one filtered
-   through onlyForGroups.
-3. Two consecutive test invocations on the same thread.
-
-Determine:
-
-A. Is there a reliable callback AFTER all applicable
-   @AfterMethod methods for ONE test invocation?
-
-B. Can this callback distinguish consecutive test
-   invocations of the same method and class?
-
-C. Does it remain reliable with skipped configurations?
-
-D. If no such callback exists, identify the safest
-   invocation-boundary cleanup strategy.
-
-Report findings with exact callback sequences.
-Do not implement a production fix yet.
-
+Do not change existing tests.
+Report the exact observed behavior.
