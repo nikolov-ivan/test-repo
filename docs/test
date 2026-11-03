@@ -3,43 +3,47 @@
 
 
 
-Update only the existing unit test that verifies
-two sequential test invocations receive distinct
-configuration contexts.
 
-The implementation now uses deferred cleanup.
+Update only the existing unit test that verifies
+context activation cleanup when a managed
+onTestSuccess callback throws an exception.
+
+The implementation now uses deferred invocation
+cleanup.
 
 Requirements:
 
-1. Verify the first invocation receives UUID-A.
+1. Configure the managed callback to throw
+   an intentional exception.
 
-2. Verify its context remains registered after
-   the test method finishes.
+2. Verify the exception is propagated according
+   to the existing callback contract.
 
-3. Start a second distinct logical invocation
-   using the existing test infrastructure.
+3. Verify the temporary context activation is
+   always closed, even when the callback throws.
 
-4. Verify UUID-A is released when the second
-   invocation begins.
+4. Verify the ScopeCursor is restored to its
+   previous state.
 
-5. Verify the second invocation receives UUID-B
-   and UUID-A != UUID-B.
+5. Verify the INVOCATION context remains
+   registered after the failed callback.
 
-6. Verify no configuration values or overrides
-   leak from the first invocation into the second.
+6. Verify the context can still be resolved
+   using its original UUID.
 
-7. Verify UUID-B remains registered until
-   the owning TestNG context finishes.
+7. Simulate onFinish() for the owning TestNG
+   context.
 
-8. Simulate onFinish() and verify UUID-B is
-   released afterward.
+8. Verify the invocation is released afterward.
 
-9. Verify the tracker, cursor and invocation
-   layers are clean after completion.
+9. Verify the tracker is empty and no orphan
+   invocation layers remain.
 
-10. Do not modify production code or other tests.
+10. Do not modify production code.
 
-11. Preserve all meaningful isolation,
-    lifecycle and UUID assertions.
+11. Do not modify other tests.
+
+12. Preserve all existing exception handling
+    and lifecycle safety assertions.
 
 Run only the updated test and report the result.
