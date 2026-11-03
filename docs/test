@@ -1,58 +1,29 @@
 
-Implement the next small lifecycle integration step.
 
-Goal:
-Ensure that a coordinator-managed onTestSuccess
-callback executes with the correct active
-INVOCATION configuration context.
+Use the existing lifecycle coordinator and its
+activate(UUID) mechanism.
+
+The TestNG adapter should implement the necessary
+ITestListener callbacks, resolve the invocation UUID
+from ITestResult, and temporarily activate the context.
+
+Delegate to framework-independent managed callbacks
+while the context is active.
 
 Requirements:
+- Keep all TestNG-specific types inside the TestNG module.
+- Do not introduce List<ITestListener> as the
+  framework's managed callback API.
+- Do not add runInContext() if activate(UUID)
+  already provides the necessary lifecycle behavior.
+- Always close temporary activations in finally
+  or try-with-resources.
+- Do not release the invocation context here.
+- Preserve compatibility with the existing coordinator.
+- Do not depend on independent TestNG listener ordering.
 
-1. Reuse the INVOCATION UUID already stored
-   in the TEST's ITestResult.
+If no framework-independent callback registration
+mechanism exists yet, first report the smallest
+necessary architectural change before implementing it.
 
-2. Resolve the existing context using that UUID.
-   Do not create a new invocation context.
-
-3. Activate the context through the existing
-   lifecycle coordinator.
-
-4. Execute the managed callback while the
-   context is active.
-
-5. Always close the temporary activation,
-   including when the callback throws.
-
-6. Do not release the invocation context here.
-   Context cleanup is handled separately.
-
-7. Do not rely on the registration order of
-   independent TestNG listeners.
-
-8. Do not introduce a new event dispatcher if
-   an existing coordinator extension point can
-   handle this responsibility.
-
-Add one real TestNG 7.12.0 integration test.
-
-Verify:
-- The test body sets an invocation override.
-- The managed onTestSuccess callback sees
-  the same active INVOCATION UUID.
-- The callback reads the overridden value
-  through the normal configuration API.
-- The temporary activation is closed afterward.
-- The invocation remains registered for
-  subsequent teardown callbacks.
-
-Important:
-If the current architecture has no suitable
-managed callback integration point, report
-the smallest necessary change before adding
-new abstractions.
-
-Do not change invocation cleanup logic.
-Do not modify unrelated components.
-Do not weaken existing assertions.
-
-
+Keep the change minimal and focused.
