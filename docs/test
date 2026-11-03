@@ -2,38 +2,22 @@
 
 
 
-Yes, but implement only the first change.
 
-Update the existing invocation tracker's enter()
-method.
+Choose option B for this step.
 
-Requirements:
+Preserve the exact existing exception message
+to maintain backward compatibility.
 
-1. If the current invocation is in SETUP phase
-   and a different class attempts to enter,
-   throw IllegalStateException.
+Restore fail-fast behavior when switching to
+a different class while the current invocation
+is still in SETUP phase.
 
-2. Do not silently release the unfinished invocation.
+Do not silently release the unfinished invocation.
 
-3. Preserve deferred cleanup for invocations that
-   have reached a valid lifecycle boundary.
+Do not modify existing tests or assertions.
 
-4. Include the previous and requested class
-   identities, invocation UUID, thread and phase
-   in the exception.
+Keep deferred cleanup for invocations that have
+reached a valid lifecycle boundary.
 
-5. Preserve final cleanup at the end of the
-   owning TestNG scope.
-
-6. Do not modify the five existing tests yet.
-
-7. Do not modify Surefire configuration or
-   exclude fixture classes yet.
-
-8. Do not modify unrelated production components.
-
-Run the specific test covering unfinished SETUP
-and class switching, then run the relevant
-invocation tracker unit tests.
-
-Report the results and any remaining failures.
+Run the affected test and the invocation tracker
+unit tests. Report the results.
