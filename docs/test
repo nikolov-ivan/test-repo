@@ -1,43 +1,39 @@
 
 
 
-Analyze the remaining failing tests in the
-TestNG module after the deferred cleanup changes.
 
-Do not modify any code yet.
+Yes, but implement only the first change.
 
-Tasks:
+Update the existing invocation tracker's enter()
+method.
 
-1. Run the complete module test suite 3 times.
-2. Collect the exact names of failing tests.
-3. Record the failure message for each test.
-4. Compare failures across all 3 runs.
-5. Classify each failure into:
+Requirements:
 
-   A. Obsolete assertion expecting immediate cleanup.
-   B. Obsolete behavior no longer supported.
-   C. Test harness or listener registration problem.
-   D. Actual production defect.
-   E. Intermittent or concurrency-related failure.
+1. If the current invocation is in SETUP phase
+   and a different class attempts to enter,
+   throw IllegalStateException.
 
-6. Pay special attention to:
-   - Context switching between different classes.
-   - Active invocation safety.
-   - Registry cleanup.
-   - ThreadLocal cleanup.
-   - Parallel execution isolation.
+2. Do not silently release the unfinished invocation.
 
-7. Do not assume that every failure is caused
-   by an outdated assertion.
+3. Preserve deferred cleanup for invocations that
+   have reached a valid lifecycle boundary.
 
-8. Do not modify or disable tests.
-9. Do not modify production code.
+4. Include the previous and requested class
+   identities, invocation UUID, thread and phase
+   in the exception.
 
-Return a concise table containing:
-- Test name
-- Failure reason
-- Classification
-- Recommended action
+5. Preserve final cleanup at the end of the
+   owning TestNG scope.
 
-Report the total number of tests and failures
-for each execution.
+6. Do not modify the five existing tests yet.
+
+7. Do not modify Surefire configuration or
+   exclude fixture classes yet.
+
+8. Do not modify unrelated production components.
+
+Run the specific test covering unfinished SETUP
+and class switching, then run the relevant
+invocation tracker unit tests.
+
+Report the results and any remaining failures.
