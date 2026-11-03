@@ -5,47 +5,45 @@
 
 
 
-Update only the existing unit test that verifies
-the INVOCATION UUID attribute is stored on
-the TEST's ITestResult and survives
-afterInvocation(TEST).
 
-The implementation now uses deferred cleanup.
+Update only the existing test that expects
+multiple @AfterMethod methods to be rejected.
+
+The implementation now supports multiple
+teardown methods with deferred cleanup.
 
 Requirements:
 
-1. Verify the UUID attribute is stored only
-   on the TEST's ITestResult.
+1. Preserve the existing test where possible.
 
-2. Verify the UUID matches the actual
-   INVOCATION context.
+2. Replace the obsolete rejection expectation
+   with verification of the supported behavior.
 
-3. Verify the attribute remains available
-   after afterInvocation(TEST).
+3. Verify that two applicable @AfterMethod
+   methods are accepted without an exception.
 
-4. Verify the temporary activation is closed
-   but the invocation remains registered.
+4. Verify @BeforeMethod, @Test and both
+   @AfterMethod callbacks use the same
+   INVOCATION context UUID.
 
-5. Verify a managed onTestSuccess callback
-   can resolve and activate the same UUID.
+5. Verify temporary activations are closed
+   after each callback.
 
-6. Verify the callback reads the correct
-   invocation-specific configuration.
+6. Verify the context remains registered
+   after the teardown callbacks.
 
-7. Simulate onFinish() for the owning
-   TestNG context.
+7. Simulate the owning TestNG context finishing.
 
-8. Verify the invocation is released,
-   the tracker is empty and no orphan
-   invocation layers remain.
+8. Verify the invocation is released afterward.
 
-9. Do not modify production code.
+9. Verify the tracker and cursor are clean,
+   and no orphan invocation layers remain.
 
-10. Do not modify other tests.
+10. Preserve existing safety assertions
+    that are still applicable.
 
-11. Preserve all existing UUID, attribute
-    isolation and lifecycle safety assertions.
+11. Do not modify production code.
 
-Run only the updated test and report
-the exact result.
+12. Do not modify other tests.
 
+Run only the updated test and report the result.
