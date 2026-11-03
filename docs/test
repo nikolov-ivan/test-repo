@@ -1,23 +1,37 @@
 
 
 
+Update only the existing unit test that verifies
+INVOCATION cleanup when no @AfterMethod exists.
 
+The implementation now uses deferred cleanup.
 
-Choose option B for this step.
+Requirements:
 
-Preserve the exact existing exception message
-to maintain backward compatibility.
+1. Do not expect the invocation context to be
+   released immediately after afterInvocation(TEST).
 
-Restore fail-fast behavior when switching to
-a different class while the current invocation
-is still in SETUP phase.
+2. Verify the temporary activation is closed.
 
-Do not silently release the unfinished invocation.
+3. Verify the INVOCATION context remains registered
+   and available for managed result callbacks.
 
-Do not modify existing tests or assertions.
+4. Simulate the owning TestNG context finishing
+   using the existing lifecycle test infrastructure.
 
-Keep deferred cleanup for invocations that have
-reached a valid lifecycle boundary.
+5. Verify the invocation is released afterward.
 
-Run the affected test and the invocation tracker
-unit tests. Report the results.
+6. Verify the tracker has no remaining open
+   invocations.
+
+7. Verify no orphan invocation layers remain.
+
+8. Do not modify production code.
+
+9. Do not modify any other tests.
+
+10. Preserve all meaningful isolation and
+    lifecycle safety assertions.
+
+Run this test and report the result.
+
