@@ -1,32 +1,58 @@
 
+Implement the next small lifecycle integration step.
 
-Implement one small change in the existing
-TestNG lifecycle listener.
-
-When beforeInvocation(TEST) resolves the
-INVOCATION context, store its UUID as a
-dedicated attribute on the TEST's ITestResult.
+Goal:
+Ensure that a coordinator-managed onTestSuccess
+callback executes with the correct active
+INVOCATION configuration context.
 
 Requirements:
-1. Use a unique attribute name.
-2. Do not reuse ACTIVATION_ATTRIBUTE.
-3. Keep the UUID after afterInvocation(TEST).
-4. Do not store context objects or mutable
-   configuration objects in the result.
-5. Do not change teardown completion logic.
-6. Preserve existing lifecycle behavior.
 
-Add real TestNG 7.12.0 integration tests verifying:
+1. Reuse the INVOCATION UUID already stored
+   in the TEST's ITestResult.
 
-- onTestSuccess receives the INVOCATION UUID
-  through its ITestResult.
-- It matches the UUID from the test body.
-- Two consecutive invocations have distinct UUIDs.
-- Parallel invocations never share or confuse UUIDs.
+2. Resolve the existing context using that UUID.
+   Do not create a new invocation context.
 
-Do not modify unrelated production components.
+3. Activate the context through the existing
+   lifecycle coordinator.
+
+4. Execute the managed callback while the
+   context is active.
+
+5. Always close the temporary activation,
+   including when the callback throws.
+
+6. Do not release the invocation context here.
+   Context cleanup is handled separately.
+
+7. Do not rely on the registration order of
+   independent TestNG listeners.
+
+8. Do not introduce a new event dispatcher if
+   an existing coordinator extension point can
+   handle this responsibility.
+
+Add one real TestNG 7.12.0 integration test.
+
+Verify:
+- The test body sets an invocation override.
+- The managed onTestSuccess callback sees
+  the same active INVOCATION UUID.
+- The callback reads the overridden value
+  through the normal configuration API.
+- The temporary activation is closed afterward.
+- The invocation remains registered for
+  subsequent teardown callbacks.
+
+Important:
+If the current architecture has no suitable
+managed callback integration point, report
+the smallest necessary change before adding
+new abstractions.
+
+Do not change invocation cleanup logic.
+Do not modify unrelated components.
 Do not weaken existing assertions.
 
-Run the relevant integration tests and report
-the results.
 
