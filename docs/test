@@ -1,42 +1,58 @@
 
-Investigate lifecycle cleanup for SUITE, TEST
-and CLASS configuration contexts.
 
-Use the existing real TestNG 7.12.0
-ServiceLoader integration test.
+Implement the smallest safe parent-context
+cleanup improvement.
+
+Focus only on CLASS and TEST contexts.
+
+The existing onFinish(ITestContext) callback
+already releases remaining INVOCATION contexts.
+
+Extend this cleanup in the following order:
+
+1. Release remaining INVOCATION contexts
+   belonging to the finishing test context.
+
+2. Release all CLASS contexts owned by
+   that test context.
+
+3. Release the TEST context itself.
 
 Requirements:
 
-1. Run one suite with two <test> elements.
+- Reuse the existing context lifecycle manager.
+- Reuse the existing context registry.
+- Remove released contexts from all ownership
+  mappings and configuration layer storage.
+- Never release a parent with live children.
+- Never release a context with active bindings.
+- Do not release SUITE or ROOT contexts yet.
+- Do not affect other parallel test contexts.
+- Handle duplicate lifecycle notifications safely.
+- Preserve fail-fast behavior for invalid cleanup.
+- Do not introduce new global state.
+- Keep core independent of TestNG.
+- Do not modify legacy listeners.
 
-2. Verify SUITE, TEST, CLASS and INVOCATION
-   contexts are created correctly.
+Add real TestNG 7.12.0 integration tests with
+one suite containing two parallel <test> elements.
 
-3. Record which contexts remain registered
-   after each TestNG lifecycle boundary.
+Verify:
 
-4. Verify that active context bindings are
-   closed after their callbacks.
+1. Each test context owns its own CLASS contexts.
+2. Both test contexts share the SUITE context.
+3. Finishing the first test context releases
+   only its INVOCATION, CLASS and TEST contexts.
+4. The second test context remains fully usable.
+5. Finishing the second test context releases
+   its remaining children and TEST context.
+6. SUITE and ROOT remain registered.
+7. No orphan layers remain for released contexts.
+8. Existing configuration isolation is preserved.
 
-5. Verify invocation cleanup still works.
+Do not implement SUITE cleanup yet.
+Do not change unrelated production components.
 
-6. Determine the correct lifecycle boundary
-   for releasing each parent context.
-
-7. Check whether releasing a parent context
-   could interfere with active child contexts.
-
-8. Check parallel execution safety.
-
-9. Do not modify production code.
-
-10. Do not change the existing registration
-    mechanism.
-
-Report:
-- Observed context lifecycle.
-- Remaining registered contexts.
-- Potential resource leaks.
-- Smallest safe cleanup improvement.
-
-Do not implement the fix yet.
+Run the new integration tests and the
+complete TestNG module test suite.
+Report any failures.
