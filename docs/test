@@ -1,31 +1,55 @@
 
-Review the existing listener architecture and
-identify the next smallest integration step.
 
-Goals:
-- Centralized listener coordination.
-- Framework-independent core.
-- Correct configuration context for every
-  managed lifecycle callback.
-- Deterministic listener execution ordering.
+Implement the smallest safe production integration
+for the existing TestNG lifecycle adapter.
 
-Inspect:
-1. Existing TestNG lifecycle adapter.
-2. Existing core lifecycle coordinator.
-3. Managed callback interface.
-4. Current listener registration mechanisms.
-5. Screenshot, reporting and logging listeners.
-6. Existing ServiceLoader registrations.
+Goal:
+Ensure the adapter is initialized and registered
+exactly once during normal TestNG execution.
 
-Report:
-- Which components are already implemented.
-- Which listeners still depend directly on TestNG.
-- How listener ordering is currently controlled.
-- The smallest safe next implementation step.
-- Any compatibility or concurrency risks.
+First inspect the existing bootstrap and listener
+registration mechanisms.
 
-Do not modify any code yet.
-Do not create new abstractions yet.
-Do not propose rewriting working components.
+Requirements:
 
-Keep the review concise and focused.
+1. Prefer reusing the existing listener registration
+   mechanism over introducing automatic discovery.
+
+2. The adapter must be available before the first
+   relevant TestNG lifecycle callback.
+
+3. Reuse the existing lifecycle coordinator,
+   context registry and invocation tracker.
+
+4. Do not create separate coordinator instances
+   for different callbacks of the same execution.
+
+5. Prevent duplicate listener registration and
+   duplicate context activation.
+
+6. Preserve existing legacy listeners unchanged.
+
+7. Do not modify the existing configuration API.
+
+8. Do not introduce TestNG dependencies into core.
+
+9. Do not introduce new abstractions unless
+   absolutely necessary.
+
+10. Preserve isolation between separate executions
+    and parallel test invocations.
+
+Add one real integration test verifying:
+- Normal TestNG registration.
+- Single adapter initialization.
+- Correct context activation during @BeforeSuite.
+- Correct context activation during @Test.
+- Final cleanup after execution.
+
+If the current registration mechanism cannot
+satisfy these requirements, report the exact
+architectural blocker before implementing
+an alternative.
+
+Do not migrate screenshot or reporting listeners yet.
+Keep changes minimal and focused.
