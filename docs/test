@@ -1,53 +1,34 @@
 
-Implement reliable deferred INVOCATION context cleanup
-for the existing TestNG lifecycle integration.
 
-The current implementation relies on counting
-declared @AfterMethod methods, which fails when
-configuration methods are filtered or disabled.
+Focus only on the two existing real TestNG
+integration tests involving:
+
+1. Two @AfterMethod methods.
+2. A group-filtered @AfterMethod.
+
+Inspect how their test harness registers and
+forwards lifecycle callbacks.
+
+The production listener now implements both
+IInvokedMethodListener and ITestListener.
 
 Requirements:
 
-1. Do not determine invocation completion by counting
-   declared teardown methods.
+- Ensure the same listener instance receives
+  both callback interfaces during real TestNG runs.
+- Preserve all lifecycle event observations.
+- Do not create duplicate listener instances.
+- Verify that all applicable teardown methods
+  share the same INVOCATION UUID.
+- Verify the remaining invocation is released
+  when the owning TestNG test context finishes.
+- Verify the tracker and registry are clean
+  after the TestNG run.
+- Do not require immediate cleanup after teardown.
+- Do not modify production code.
+- Do not modify unrelated tests.
+- Do not weaken UUID or configuration assertions.
 
-2. Keep the INVOCATION context available throughout
-   @BeforeMethod, @Test, managed test-result callbacks,
-   and all applicable @AfterMethod callbacks.
+Run only these two integration tests.
 
-3. Release the previous invocation when the next
-   distinct logical test invocation begins.
-
-4. When a TestNG scope finishes, release any remaining
-   invocation contexts, even if no subsequent test runs.
-
-5. Cleanup must work with parallel DataProviders,
-   retries, skipped tests and filtered configuration
-   methods.
-
-6. Do not rely solely on ThreadLocal for final cleanup.
-   Contexts must be tracked by stable identifiers.
-
-7. Never release a context while it has an active
-   managed activation.
-
-8. Preserve the current configuration inheritance
-   and override behavior.
-
-9. Reuse existing lifecycle components.
-   Do not introduce unnecessary abstractions.
-
-10. Keep all TestNG-specific code outside core.
-
-First inspect the existing lifecycle implementation
-and identify the smallest safe change.
-
-Implement only the cleanup changes required by
-the current failing integration tests.
-
-Do not modify unrelated components or weaken
-existing assertions.
-
-Run real TestNG 7.12.0 integration tests and report
-remaining failures separately.
-
+Report the exact results and any remaining failures.
