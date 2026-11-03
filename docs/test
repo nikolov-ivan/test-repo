@@ -1,23 +1,32 @@
 
-Add one real TestNG 7.12.0 integration test to
-TestNgLifecycleListenerTest.
 
-Use the actual TestNgLifecycleListener.
+Implement one small change in the existing
+TestNG lifecycle listener.
 
-Add a second listener implementing ITestListener.
+When beforeInvocation(TEST) resolves the
+INVOCATION context, store its UUID as a
+dedicated attribute on the TEST's ITestResult.
 
-In onTestSuccess(), attempt to read an
-INVOCATION-scoped configuration value through
-the normal configuration API.
+Requirements:
+1. Use a unique attribute name.
+2. Do not reuse ACTIVATION_ATTRIBUTE.
+3. Keep the UUID after afterInvocation(TEST).
+4. Do not store context objects or mutable
+   configuration objects in the result.
+5. Do not change teardown completion logic.
+6. Preserve existing lifecycle behavior.
 
-Verify:
-1. @BeforeMethod sets an invocation-specific override.
-2. The @Test body reads the overridden value.
-3. The ITestListener.onTestSuccess callback reads
-   the same overridden value.
-4. It resolves to the same INVOCATION UUID.
-5. The callback does not fall back to ROOT configuration.
+Add real TestNG 7.12.0 integration tests verifying:
 
-Do not modify production code.
-Do not change existing tests.
-Report the exact observed behavior.
+- onTestSuccess receives the INVOCATION UUID
+  through its ITestResult.
+- It matches the UUID from the test body.
+- Two consecutive invocations have distinct UUIDs.
+- Parallel invocations never share or confuse UUIDs.
+
+Do not modify unrelated production components.
+Do not weaken existing assertions.
+
+Run the relevant integration tests and report
+the results.
+
