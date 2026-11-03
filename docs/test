@@ -1,43 +1,42 @@
 
+Investigate lifecycle cleanup for SUITE, TEST
+and CLASS configuration contexts.
 
-Choose option A: ServiceLoader.
-
-Use the official TestNG ServiceLoader mechanism.
+Use the existing real TestNG 7.12.0
+ServiceLoader integration test.
 
 Requirements:
 
-1. Keep the core module independent of TestNG.
+1. Run one suite with two <test> elements.
 
-2. Implement a no-argument constructor that
-   initializes the required lifecycle components.
+2. Verify SUITE, TEST, CLASS and INVOCATION
+   contexts are created correctly.
 
-3. Do not introduce a JVM-wide static singleton.
+3. Record which contexts remain registered
+   after each TestNG lifecycle boundary.
 
-4. Ensure callbacks for all <test> elements
-   within one TestNG execution use the same
-   adapter instance and shared lifecycle state.
+4. Verify that active context bindings are
+   closed after their callbacks.
 
-5. Preserve isolation between separate TestNG
-   executions in the same JVM.
+5. Verify invocation cleanup still works.
 
-6. Prevent duplicate registration when tests
-   also register the adapter programmatically.
+6. Determine the correct lifecycle boundary
+   for releasing each parent context.
 
-7. Do not migrate existing legacy listeners.
+7. Check whether releasing a parent context
+   could interfere with active child contexts.
 
-8. Do not modify existing configuration behavior.
+8. Check parallel execution safety.
 
-Before enabling automatic registration globally,
-create an isolated integration test with:
+9. Do not modify production code.
 
-- One suite containing two <test> elements.
-- Parallel test execution.
-- Separate configuration contexts.
-- Verification of adapter identity.
-- Verification of final context cleanup.
+10. Do not change the existing registration
+    mechanism.
 
-First report whether the tests demonstrate
-the required instance-sharing behavior.
+Report:
+- Observed context lifecycle.
+- Remaining registered contexts.
+- Potential resource leaks.
+- Smallest safe cleanup improvement.
 
-Do not enable global registration until these
-checks pass.
+Do not implement the fix yet.
