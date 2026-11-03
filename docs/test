@@ -6,44 +6,45 @@
 
 
 
-Update only the existing test that expects
-multiple @AfterMethod methods to be rejected.
+Update only the existing real TestNG 7.12.0
+integration test where an independent ITestListener
+attempts to read invocation-scoped configuration.
 
-The implementation now supports multiple
-teardown methods with deferred cleanup.
+The current architecture guarantees an active
+INVOCATION context for coordinator-managed callbacks,
+not for independently registered TestNG listeners.
 
 Requirements:
 
-1. Preserve the existing test where possible.
+1. Preserve the independent ITestListener.
 
-2. Replace the obsolete rejection expectation
-   with verification of the supported behavior.
+2. Verify its onTestSuccess receives the correct
+   INVOCATION UUID through ITestResult attributes.
 
-3. Verify that two applicable @AfterMethod
-   methods are accepted without an exception.
+3. Verify the independent listener does not
+   automatically receive an active ScopeCursor binding.
 
-4. Verify @BeforeMethod, @Test and both
-   @AfterMethod callbacks use the same
-   INVOCATION context UUID.
+4. Add or reuse a coordinator-managed onTestSuccess
+   callback in the same integration test.
 
-5. Verify temporary activations are closed
-   after each callback.
+5. Verify the managed callback receives the correct
+   active INVOCATION UUID.
 
-6. Verify the context remains registered
-   after the teardown callbacks.
+6. Verify it reads the override created by
+   the test body through the normal configuration API.
 
-7. Simulate the owning TestNG context finishing.
+7. Verify temporary activation cleanup.
 
-8. Verify the invocation is released afterward.
+8. Verify the invocation is released after
+   the owning TestNG context finishes.
 
-9. Verify the tracker and cursor are clean,
-   and no orphan invocation layers remain.
+9. Do not depend on the callback registration order
+   of independent listeners.
 
-10. Preserve existing safety assertions
-    that are still applicable.
+10. Do not modify production code or other tests.
 
-11. Do not modify production code.
+11. Do not weaken UUID, configuration isolation
+    or lifecycle safety assertions.
 
-12. Do not modify other tests.
-
-Run only the updated test and report the result.
+Run only this integration test and report
+the exact result.
