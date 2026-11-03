@@ -4,46 +4,48 @@
 
 
 
-Update only the existing unit test that verifies
-context activation cleanup when a managed
-onTestSuccess callback throws an exception.
 
-The implementation now uses deferred invocation
-cleanup.
+Update only the existing unit test that verifies
+the INVOCATION UUID attribute is stored on
+the TEST's ITestResult and survives
+afterInvocation(TEST).
+
+The implementation now uses deferred cleanup.
 
 Requirements:
 
-1. Configure the managed callback to throw
-   an intentional exception.
+1. Verify the UUID attribute is stored only
+   on the TEST's ITestResult.
 
-2. Verify the exception is propagated according
-   to the existing callback contract.
+2. Verify the UUID matches the actual
+   INVOCATION context.
 
-3. Verify the temporary context activation is
-   always closed, even when the callback throws.
+3. Verify the attribute remains available
+   after afterInvocation(TEST).
 
-4. Verify the ScopeCursor is restored to its
-   previous state.
+4. Verify the temporary activation is closed
+   but the invocation remains registered.
 
-5. Verify the INVOCATION context remains
-   registered after the failed callback.
+5. Verify a managed onTestSuccess callback
+   can resolve and activate the same UUID.
 
-6. Verify the context can still be resolved
-   using its original UUID.
+6. Verify the callback reads the correct
+   invocation-specific configuration.
 
-7. Simulate onFinish() for the owning TestNG
-   context.
+7. Simulate onFinish() for the owning
+   TestNG context.
 
-8. Verify the invocation is released afterward.
-
-9. Verify the tracker is empty and no orphan
+8. Verify the invocation is released,
+   the tracker is empty and no orphan
    invocation layers remain.
 
-10. Do not modify production code.
+9. Do not modify production code.
 
-11. Do not modify other tests.
+10. Do not modify other tests.
 
-12. Preserve all existing exception handling
-    and lifecycle safety assertions.
+11. Preserve all existing UUID, attribute
+    isolation and lifecycle safety assertions.
 
-Run only the updated test and report the result.
+Run only the updated test and report
+the exact result.
+
