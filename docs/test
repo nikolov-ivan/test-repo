@@ -1,53 +1,51 @@
 
+Analyze the existing screenshot listeners before
+migrating their configuration reads.
 
-Migrate only the Kibana reporting configuration reads
-inside TestListenerParent.onTestSuccess.
+Do not modify production code yet.
 
-Goal:
-Use the invocation-specific configuration snapshot
-exposed through the existing ITestResult attribute,
-instead of relying on thread-local properties.
+Tasks:
 
-Requirements:
+1. Identify all screenshot-related listeners
+   and their configuration reads.
 
-1. Locate the existing Kibana reporting block.
+2. Identify which reads occur in onTestStart,
+   onTestSuccess, onTestFailure and onTestSkipped.
 
-2. Identify every configuration property it reads.
+3. Verify the real TestNG 7.12.0 callback order
+   relative to the lifecycle adapter.
 
-3. Use the existing read-only configuration supplier
-   attached to ITestResult.
+4. Determine whether the configuration supplier
+   is already attached to ITestResult when each
+   callback executes.
 
-4. Resolve the configuration only during the callback.
+5. Verify whether the correct configuration
+   can be resolved without an active ScopeCursor.
 
-5. Do not use ScopeCursor, reflection or global state.
+6. Consider parallel execution, retries and
+   skipped tests.
 
-6. Preserve all existing reporting behavior,
-   default values and conditions.
+7. Preserve the existing screenshot behavior
+   and default configuration values.
 
-7. Handle missing configuration attributes explicitly.
-   Preserve compatibility for executions without
-   the new lifecycle adapter.
+8. Do not introduce global mutable state.
 
-8. Never silently use ROOT configuration when
-   an invocation context is expected.
+9. Do not change listener registration or ordering.
 
-9. Do not modify other methods or listeners.
+10. Do not migrate the properties manager yet.
 
-10. Do not migrate the entire properties manager.
+11. Keep the core independent of TestNG.
 
-11. Do not change listener registration or ordering.
+Also run the complete Maven reactor build to
+verify the previous Kibana migration introduced
+no regressions.
 
-12. Do not change the lifecycle adapter or coordinator.
+Report:
+- Exact Maven test results.
+- Callback ordering.
+- Configuration availability per callback.
+- The safest screenshot listener to migrate first.
+- The smallest required production change.
 
-Add a real integration test verifying:
+Do not implement the migration yet.
 
-- Two parallel tests with different environments.
-- Correct invocation-specific Kibana settings.
-- Both listener registration orders.
-- No cross-test configuration leakage.
-- Existing legacy execution compatibility.
-
-Run focused tests and the complete affected module.
-
-Report the exact code changes and test results.
-Keep the implementation minimal.
