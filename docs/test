@@ -3,37 +3,47 @@
 
 
 
-Fix all four failing integration tests affected
-by the new SUITE context cleanup lifecycle.
+
+Investigate ROOT configuration context ownership
+and cleanup in the existing TestNG lifecycle adapter.
+
+Do not modify production code yet.
+
+Inspect the current adapter, lifecycle coordinator,
+context registry and TestNG 7.12.0 integration.
+
+Determine whether IExecutionListener.onExecutionFinish()
+provides a reliable cleanup boundary.
+
+Verify these scenarios:
+
+1. One TestNG execution with one suite.
+2. One TestNG execution containing two suites.
+3. Two consecutive TestNG executions in the same JVM.
+4. ServiceLoader-based registration.
+5. Programmatic listener registration.
 
 Requirements:
 
-1. Preserve all meaningful lifecycle, UUID,
-   configuration and concurrency assertions.
+- ROOT remains available during all suite callbacks.
+- Completing one suite must not release ROOT
+  while another suite is still executing.
+- All child contexts must be released before ROOT.
+- No context with active bindings may be released.
+- Separate executions must remain isolated.
+- No orphan contexts or configuration layers
+  should remain after execution cleanup.
 
-2. Verify SUITE remains available and active
-   during @AfterSuite.
+Check whether the existing core lifecycle manager
+supports safe ROOT release.
 
-3. Verify SUITE is released after
-   ISuiteListener.onFinish(ISuite).
+Report:
+- Actual callback sequence.
+- Current ROOT ownership behavior.
+- Whether ROOT cleanup is missing.
+- Smallest safe implementation change.
+- Any lifecycle or concurrency risks.
 
-4. Verify ROOT remains registered.
-
-5. Verify all INVOCATION, CLASS, TEST and SUITE
-   contexts are properly released.
-
-6. Verify ownership mappings and configuration
-   layers are cleaned up.
-
-7. Do not weaken assertions or hide failures.
-
-8. Do not modify production code unless an actual
-   production defect is discovered. Report such
-   defects before making changes.
-
-9. Run the entire TestNG module 3 times.
-
-10. Report total tests, passed, failed and skipped
-    for each execution.
-
-Keep changes focused on the affected tests.
+Do not add another coordinator.
+Do not introduce static global state.
+Do not modify existing legacy listeners.
