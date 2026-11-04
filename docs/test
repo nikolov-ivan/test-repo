@@ -1,67 +1,52 @@
 
-Implement the smallest safe ROOT context cleanup
-in the existing TestNG lifecycle adapter.
+Enable production ServiceLoader registration for
+the existing TestNG lifecycle adapter.
 
 Requirements:
 
-1. Implement IExecutionListener.
+1. Register the existing adapter through
+   META-INF/services/org.testng.ITestNGListener
+   in the TestNG integration module.
 
-2. Track ROOT ownership per adapter instance.
+2. Reuse the existing no-argument constructor.
 
-3. The adapter owns ROOT only when it creates
-   that context internally.
+3. Ensure exactly one adapter instance owns
+   lifecycle state per TestNG execution.
 
-4. On onExecutionFinish(), release ROOT only
-   if the adapter owns it.
+4. Do not register the adapter through @Listeners.
 
-5. Never release an externally injected ROOT.
+5. Prevent duplicate registration when another
+   instance is registered programmatically.
 
-6. Before releasing ROOT, verify:
-   - No live child contexts.
-   - No active context bindings.
-   - No remaining invocation contexts.
+6. Preserve the existing ROOT ownership and
+   single-use lifecycle behavior.
 
-7. Use the existing coordinator.release(UUID).
+7. Do not modify existing legacy listeners.
 
-8. Do not silently ignore invalid lifecycle states.
+8. Do not migrate the configuration API yet.
 
-9. Make repeated onExecutionFinish() calls safe.
+9. Keep core independent of TestNG.
 
-10. Define the adapter as single-use when it
-    owns ROOT. Reusing it for another execution
-    must fail fast with a clear diagnostic message.
+10. Do not introduce static singleton state.
 
-11. Do not introduce static global state.
+Verification:
 
-12. Do not create another coordinator or registry.
+- Run normal Maven TestNG execution.
+- Verify automatic discovery works.
+- Verify one suite with multiple parallel tests.
+- Verify correct context creation and cleanup.
+- Verify no duplicate lifecycle callbacks.
+- Verify no orphan contexts or configuration layers.
+- Verify existing legacy listeners still execute.
+- Run the complete TestNG module three times.
 
-13. Do not modify legacy listeners.
+If global registration causes existing tests
+to fail, investigate the exact interaction
+before modifying tests or production behavior.
 
-14. Keep the core independent of TestNG.
+Do not weaken assertions or suppress failures.
 
-Add real TestNG 7.12.0 integration tests for:
+Report exact test results and all compatibility
+issues discovered.
 
-- One suite.
-- Two parallel suites.
-- Two consecutive executions with separate
-  adapter instances.
-- ServiceLoader registration.
-- Programmatic registration.
-- Externally owned ROOT.
-- Duplicate execution-finish notification.
-- Attempted reuse after ROOT release.
-- Rejection of ROOT release with live children.
-
-Verify that after a normally completed
-execution with an owned ROOT:
-
-- All configuration contexts are released.
-- No ownership mappings remain.
-- No orphan configuration layers remain.
-- No ScopeCursor bindings remain.
-
-Do not enable global ServiceLoader registration yet.
-
-Run the complete TestNG module three times.
-Report exact results and remaining limitations.
 
