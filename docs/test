@@ -1,66 +1,64 @@
 
-Verify ENVIRONMENT configuration resolution
-during real parallel TestNG 7.12.0 execution.
+Investigate and test invocation-specific
+configuration access from an independently
+registered TestNG ITestListener.
 
-The lifecycle adapter already loads BASE,
-JVM system properties and XML parameters
-at all supported scopes.
+The existing lifecycle adapter already stores
+the invocation context UUID in an ITestResult
+attribute.
 
-The existing environment selection and
-composition components must be reused.
+Goal:
+An independent listener must resolve the
+correct configuration during onTestSuccess,
+onTestFailure and onTestSkipped, even when
+there is no active ScopeCursor binding.
 
-Do not modify production code yet.
+Requirements:
 
-Create one focused integration test with:
+1. Create a focused real TestNG 7.12.0
+   integration test.
 
-- ROOT selecting environment=acc by default.
-- Two parallel XML test elements.
-- TEST A selecting environment=dev.
-- TEST B selecting environment=uat.
-- Different properties in the two environment files.
-- At least one property shared by both files
-  with different values.
+2. Use two parallel XML test elements with
+   different environments and configuration
+   values.
 
-Verify:
+3. Register an independent ITestListener
+   alongside the existing lifecycle adapter.
 
-1. Each TEST selects its own environment file.
+4. Inspect the invocation UUID stored in
+   each ITestResult.
 
-2. Environment values are available in child
-   CLASS and INVOCATION contexts.
+5. Verify whether the listener can resolve
+   the exact invocation configuration snapshot
+   without using ThreadLocal state.
 
-3. No environment values leak between parallel
-   TEST contexts.
+6. Verify that the invocation context remains
+   registered while the callback executes.
 
-4. XML parameters override ENVIRONMENT values
-   according to the established source priority.
+7. Verify that each callback observes the
+   correct XML and environment values.
 
-5. JVM system properties retain their priority.
+8. Verify no cross-test or cross-thread leakage.
 
-6. Environment changes at a more specific
-   scope do not retain stale values from the
-   previously selected environment.
+9. Test successful, failed and skipped methods.
 
-7. Missing environment files produce the
-   documented behavior.
+10. Check listener ordering independence.
 
-8. No duplicate environment layers remain.
+11. Do not change production code yet.
 
-9. Context cleanup removes all associated layers.
+12. Do not modify the existing properties
+    manager or legacy listeners.
 
-10. The existing configuration resolver and
-    environment composer are reused.
-
-Do not modify the legacy properties manager.
-Do not modify production listeners.
-Do not introduce new configuration abstractions.
+13. Keep the core independent of TestNG.
 
 Report:
-- Exact test results.
-- Whether environment selection works correctly.
-- Any remaining integration gaps.
-- The smallest required fix, if one exists.
+- Which scenarios already work.
+- Which scenarios fail.
+- Whether the current attribute is sufficient.
+- The smallest safe integration change needed.
 
-Do not implement fixes yet.
+Do not implement the fix yet.
+
 
 
 
