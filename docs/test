@@ -1,51 +1,40 @@
 
-Migrate only the existing
-PropertiesManager.getProperties() method
-to the hierarchical configuration engine.
+Analyze the existing
+PropertiesManager.setProperties(Properties)
+method before migrating it.
 
 Requirements:
 
-1. Preserve the existing public method signature
-   and return type exactly.
+1. Preserve the existing class and every
+   public method signature exactly.
 
-2. When an active configuration binding exists,
-   resolve the current effective snapshot.
+2. Inspect the current setProperties behavior:
+   replacement, merging, null handling and
+   interaction with getProperties().
 
-3. Return the resolved values as a new independent
-   java.util.Properties object.
+3. Find all production usages.
 
-4. Never expose or modify internal configuration
-   layers, snapshots or shared mutable state.
+4. Determine how to support the new
+   configuration engine without promoting
+   inherited snapshot values into
+   PROGRAMMATIC overrides unintentionally.
 
-5. Ensure getProperties() and getProperty(key)
-   return consistent values for the same context.
+5. Preserve source priorities, scope isolation
+   and existing legacy behavior.
 
-6. Respect all existing source priorities,
-   inheritance and programmatic updates.
+6. Do not introduce another configuration store
+   or global mutable state.
 
-7. Preserve existing legacy behavior when
-   no new configuration binding is active.
+7. Keep core independent of TestNG.
 
-8. Before changing the implementation, inspect
-   all usages of getProperties() and identify
-   any callers relying on mutation of the
-   returned object. Report compatibility risks.
+8. Do not modify production code yet.
 
-9. Preserve parallel isolation, nested
-   activations and independent coordinators.
+9. Run the full Maven reactor to verify
+   the previous getProperties migration.
 
-10. Do not change any other public methods,
-    production listeners or lifecycle behavior.
+Report the smallest safe implementation
+strategy and exact regression results.
 
-11. Do not introduce global mutable state.
-
-12. Keep the core independent of TestNG.
-
-Add focused tests and run the complete
-affected modules.
-
-Report exact results and compatibility risks.
-Keep production changes minimal.
 
 
 
