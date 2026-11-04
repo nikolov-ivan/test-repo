@@ -1,49 +1,67 @@
 
-
-
-
-
-
-Investigate ROOT configuration context ownership
-and cleanup in the existing TestNG lifecycle adapter.
-
-Do not modify production code yet.
-
-Inspect the current adapter, lifecycle coordinator,
-context registry and TestNG 7.12.0 integration.
-
-Determine whether IExecutionListener.onExecutionFinish()
-provides a reliable cleanup boundary.
-
-Verify these scenarios:
-
-1. One TestNG execution with one suite.
-2. One TestNG execution containing two suites.
-3. Two consecutive TestNG executions in the same JVM.
-4. ServiceLoader-based registration.
-5. Programmatic listener registration.
+Implement the smallest safe ROOT context cleanup
+in the existing TestNG lifecycle adapter.
 
 Requirements:
 
-- ROOT remains available during all suite callbacks.
-- Completing one suite must not release ROOT
-  while another suite is still executing.
-- All child contexts must be released before ROOT.
-- No context with active bindings may be released.
-- Separate executions must remain isolated.
-- No orphan contexts or configuration layers
-  should remain after execution cleanup.
+1. Implement IExecutionListener.
 
-Check whether the existing core lifecycle manager
-supports safe ROOT release.
+2. Track ROOT ownership per adapter instance.
 
-Report:
-- Actual callback sequence.
-- Current ROOT ownership behavior.
-- Whether ROOT cleanup is missing.
-- Smallest safe implementation change.
-- Any lifecycle or concurrency risks.
+3. The adapter owns ROOT only when it creates
+   that context internally.
 
-Do not add another coordinator.
-Do not introduce static global state.
-Do not modify existing legacy listeners.
+4. On onExecutionFinish(), release ROOT only
+   if the adapter owns it.
+
+5. Never release an externally injected ROOT.
+
+6. Before releasing ROOT, verify:
+   - No live child contexts.
+   - No active context bindings.
+   - No remaining invocation contexts.
+
+7. Use the existing coordinator.release(UUID).
+
+8. Do not silently ignore invalid lifecycle states.
+
+9. Make repeated onExecutionFinish() calls safe.
+
+10. Define the adapter as single-use when it
+    owns ROOT. Reusing it for another execution
+    must fail fast with a clear diagnostic message.
+
+11. Do not introduce static global state.
+
+12. Do not create another coordinator or registry.
+
+13. Do not modify legacy listeners.
+
+14. Keep the core independent of TestNG.
+
+Add real TestNG 7.12.0 integration tests for:
+
+- One suite.
+- Two parallel suites.
+- Two consecutive executions with separate
+  adapter instances.
+- ServiceLoader registration.
+- Programmatic registration.
+- Externally owned ROOT.
+- Duplicate execution-finish notification.
+- Attempted reuse after ROOT release.
+- Rejection of ROOT release with live children.
+
+Verify that after a normally completed
+execution with an owned ROOT:
+
+- All configuration contexts are released.
+- No ownership mappings remain.
+- No orphan configuration layers remain.
+- No ScopeCursor bindings remain.
+
+Do not enable global ServiceLoader registration yet.
+
+Run the complete TestNG module three times.
+Report exact results and remaining limitations.
+
