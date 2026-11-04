@@ -1,46 +1,70 @@
 
-Validate the proposed compatibility fix for
-unsupported ITestContext injection in
-@BeforeSuite and @AfterSuite.
+Implement the minimal TestNG 7.12.0 compatibility
+fix for unsupported native ITestContext injection
+in @BeforeSuite and @AfterSuite.
 
-Do not modify production code yet.
+Follow the validated lifecycle probe findings.
 
-Create a real TestNG 7.12.0 lifecycle probe.
+Requirements:
 
-Verify:
+1. Keep the existing setup and teardown methods
+   accepting ITestContext as ordinary Java methods.
 
-1. Whether Reporter.getCurrentTestResult()
-   is available during @BeforeSuite.
+2. Remove unsupported TestNG annotations from
+   methods accepting ITestContext.
 
-2. Whether getTestContext() returns the
-   correct owning suite.
+3. Introduce annotated no-argument lifecycle
+   wrappers where necessary.
 
-3. Whether the same behavior is reliable
-   during @AfterSuite.
+4. Obtain ITestContext using the validated
+   Reporter.getCurrentTestResult() approach.
 
-4. Test one suite with two parallel <test>
-   elements having different XML parameters.
+5. Preserve polymorphic method dispatch and
+   existing superclass initialization chains.
 
-5. Verify suite initialization runs exactly once.
+6. Preserve separate annotated lifecycle wrappers
+   where different inheritance hierarchies require
+   them.
 
-6. Verify suite teardown runs exactly once.
+7. Avoid duplicate setup or teardown execution.
 
-7. Inspect whether the proposed wrapper preserves
-   existing overridden setup and teardown methods.
+8. Preserve existing suite-level XML parameter
+   handling and retry configuration behavior.
 
-8. Compare this approach with obtaining ISuite
-   from the existing suite lifecycle listener.
+9. Preserve existing mobile and browser
+   initialization behavior.
 
-9. Identify whether suite-specific initialization
-   can use the existing configuration coordinator
-   without depending on Reporter.
+10. Do not modify the new lifecycle coordinator
+    or configuration context management.
 
-Do not change TestNG versions.
-Do not modify existing assertions.
-Do not modify unrelated modules.
+11. Do not modify unrelated production code.
 
-Report the safest minimal compatibility fix
-and any limitations before implementing it.
+12. Document that the retrieved ITestContext
+    belongs to a particular XML test element.
+    Do not assume its test-level parameters
+    represent all tests in the suite.
+
+Add real TestNG 7.12.0 integration tests covering:
+
+- A single inheritance hierarchy.
+- Browser and mobile hierarchies in one suite.
+- Two parallel XML test elements with different
+  configuration values.
+- Correct initialization and teardown ordering.
+- No duplicate or missing lifecycle callbacks.
+- Correct execution of overridden setup and
+  teardown methods.
+
+Run:
+1. The affected integration tests.
+2. The complete TestNG module.
+3. The full Maven reactor build.
+
+If any test fails, investigate before changing
+assertions or unrelated components.
+
+Report all changes and exact test results.
+
 
 
 
