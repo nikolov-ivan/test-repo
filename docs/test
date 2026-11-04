@@ -1,85 +1,71 @@
 
-Complete the migration of the existing
-PropertiesManager to the hierarchical
-configuration engine.
+Complete the remaining configuration migration.
 
-The foundational integration is already implemented
-and tested. Do not redesign it.
+The main PropertiesManager methods have already
+been migrated successfully.
 
-GOAL:
-Migrate all remaining public methods in one pass.
+Focus on the remaining legacy loading and reset
+methods and their integration with BaseSuite
+and PropertiesLoadingStrategy.
 
-STRICT COMPATIBILITY:
-- Keep the existing PropertiesManager class.
-- Preserve every existing public method name,
-  signature, return type and static modifier.
-- Do not remove public methods.
-- Existing consumer code must compile unchanged.
-- Preserve legacy behavior when no active
-  configuration binding exists.
+Requirements:
 
-IMPLEMENTATION:
-1. Inspect all remaining public methods and
-   their usages before changing them.
+1. Preserve all existing public classes,
+   methods and signatures.
 
-2. Route configuration reads through the
-   active context's resolved snapshot.
+2. Identify every legacy loading method still
+   invoked during an active configuration context.
 
-3. Route configuration writes through the
-   appropriate existing configuration updater.
+3. Ensure configuration loaded by these methods
+   is visible through the new configuration engine.
 
-4. Preserve source precedence and scope
-   inheritance.
+4. Use the correct configuration source and scope.
+   Do not place XML or environment configuration
+   into PROGRAMMATIC merely for convenience.
 
-5. Reuse the existing binding, resolver,
-   coordinator and layer store.
+5. Reuse existing loaders, selectors, layers,
+   resolvers and lifecycle infrastructure.
 
-6. Avoid duplicated configuration storage
-   when the new engine is active.
+6. Avoid loading the same configuration twice.
 
-7. Preserve existing method-specific semantics,
-   including defaults, empty values, nulls
-   and environment selection.
+7. Preserve existing reload and reset semantics
+   wherever safely possible.
 
-8. Do not silently promote inherited values
-   into local overrides.
+8. Do not create a second configuration store.
 
-9. Handle reset and reload methods carefully.
-   Do not destroy active contexts or parent
-   configuration layers.
+9. Do not introduce global mutable state.
 
-10. Do not change already migrated methods
-    unless necessary to fix a demonstrated defect.
+10. Maintain backward compatibility for consumers
+    without an active configuration context.
 
-11. Do not modify production listeners,
-    TestNG lifecycle integration or module
-    dependencies.
+11. Preserve parallel isolation and source priority.
 
-12. Keep core independent of TestNG.
+12. Keep the core independent of TestNG.
 
-TESTING:
-- Add parameterized tests for the remaining
-  methods and their expected behavior.
-- Test ROOT, SUITE, TEST, CLASS and INVOCATION.
-- Test parallel execution and nested activations.
-- Test source precedence, inheritance and
-  legacy compatibility.
-- Test invalid and released contexts.
-- Run the full Maven reactor.
+13. Do not rewrite the architecture or existing
+    listeners.
 
-IMPORTANT:
-If any method cannot preserve its previous
-semantics under the new architecture, do not
-invent behavior. Leave that method unchanged,
-report the exact incompatibility, and continue
-migrating the other methods.
+14. If a legacy method is redundant because
+    the lifecycle adapter already loads its data,
+    prove this with tests before making it a
+    no-op.
 
-DELIVERABLES:
-- List of migrated methods.
-- List of methods left unchanged and why.
-- Compatibility differences.
-- Exact test results.
-- Minimal production changes.
+Add integration tests covering the actual
+BaseSuite configuration loading flow,
+including environment selection and overrides.
+
+Run the full Maven reactor.
+
+Report:
+- All migrated methods
+- Any remaining legacy-only methods
+- Configuration loading paths still using
+  ThreadLocal as their source of truth
+- Compatibility differences
+- Exact regression results
+
+Keep changes focused.
+
 
 
 
