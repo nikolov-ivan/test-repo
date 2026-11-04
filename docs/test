@@ -1,54 +1,53 @@
 
-Extend the existing real TestNG 7.12.0
-integration tests for independent listener
-configuration access.
 
-Focus only on two additional scenarios:
+Migrate only the Kibana reporting configuration reads
+inside TestListenerParent.onTestSuccess.
 
-1. A test that fails and is retried using
-   IRetryAnalyzer.
-
-2. A test skipped because of a failed
-   dependsOnMethods dependency.
+Goal:
+Use the invocation-specific configuration snapshot
+exposed through the existing ITestResult attribute,
+instead of relying on thread-local properties.
 
 Requirements:
 
-- Use the existing public ITestResult
-  configuration supplier attribute.
-- Do not use reflection or ThreadLocal.
-- Verify each retry attempt gets its own
-  invocation context UUID.
-- Verify configuration isolation between
-  retry attempts.
-- Verify the lifecycle and cleanup of
-  each retry attempt.
-- Determine whether dependency-skipped
-  results contain the configuration attribute.
-- Do not invent an invocation context for
-  a test that never started.
-- Missing attributes must be handled explicitly.
-- Never silently fall back to ROOT.
-- Test both independent listener registration
-  orders.
+1. Locate the existing Kibana reporting block.
 
-Do not modify production code yet.
-Do not modify legacy listeners.
-Do not weaken existing assertions.
+2. Identify every configuration property it reads.
 
-Run focused tests and the complete TestNG module.
+3. Use the existing read-only configuration supplier
+   attached to ITestResult.
 
-Report exact results and any remaining gaps.
+4. Resolve the configuration only during the callback.
 
+5. Do not use ScopeCursor, reflection or global state.
 
+6. Preserve all existing reporting behavior,
+   default values and conditions.
 
+7. Handle missing configuration attributes explicitly.
+   Preserve compatibility for executions without
+   the new lifecycle adapter.
 
+8. Never silently use ROOT configuration when
+   an invocation context is expected.
 
+9. Do not modify other methods or listeners.
 
+10. Do not migrate the entire properties manager.
 
+11. Do not change listener registration or ordering.
 
+12. Do not change the lifecycle adapter or coordinator.
 
+Add a real integration test verifying:
 
+- Two parallel tests with different environments.
+- Correct invocation-specific Kibana settings.
+- Both listener registration orders.
+- No cross-test configuration leakage.
+- Existing legacy execution compatibility.
 
+Run focused tests and the complete affected module.
 
-
-
+Report the exact code changes and test results.
+Keep the implementation minimal.
