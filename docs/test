@@ -1,51 +1,60 @@
 
-Analyze the existing screenshot listeners before
-migrating their configuration reads.
+Start the incremental migration of the existing
+PropertiesManager to the new hierarchical
+configuration system.
 
-Do not modify production code yet.
+Focus only on the existing getProperty(String)
+read operation.
 
-Tasks:
+Requirements:
 
-1. Identify all screenshot-related listeners
-   and their configuration reads.
+1. Keep the PropertiesManager class unchanged
+   as a public API.
 
-2. Identify which reads occur in onTestStart,
-   onTestSuccess, onTestFailure and onTestSkipped.
+2. Preserve all existing public method names,
+   signatures, modifiers and return types.
 
-3. Verify the real TestNG 7.12.0 callback order
-   relative to the lifecycle adapter.
+3. When a valid configuration context is active,
+   resolve the property through the existing
+   configuration engine and current snapshot.
 
-4. Determine whether the configuration supplier
-   is already attached to ITestResult when each
-   callback executes.
+4. Reuse the existing context, resolver and
+   configuration infrastructure.
 
-5. Verify whether the correct configuration
-   can be resolved without an active ScopeCursor.
+5. Do not create a second configuration store,
+   coordinator or global mutable singleton.
 
-6. Consider parallel execution, retries and
-   skipped tests.
+6. Preserve legacy behavior for executions
+   that do not use the new lifecycle integration.
 
-7. Preserve the existing screenshot behavior
-   and default configuration values.
+7. Never silently fall back to ROOT or stale
+   thread-local values when a scoped context
+   is expected.
 
-8. Do not introduce global mutable state.
+8. Do not attempt to infer an ITestResult inside
+   a zero-argument or key-only API.
 
-9. Do not change listener registration or ordering.
+9. Do not change setProperty, setProperties,
+   getProperties or other methods yet.
 
-10. Do not migrate the properties manager yet.
+10. Do not modify production listeners.
 
 11. Keep the core independent of TestNG.
 
-Also run the complete Maven reactor build to
-verify the previous Kibana migration introduced
-no regressions.
+12. If the existing architecture cannot safely
+    locate the configuration engine from the
+    active context, identify the exact missing
+    dependency before implementing a workaround.
 
-Report:
-- Exact Maven test results.
-- Callback ordering.
-- Configuration availability per callback.
-- The safest screenshot listener to migrate first.
-- The smallest required production change.
+Add tests covering:
+- ROOT, SUITE, TEST, CLASS and INVOCATION reads.
+- Scope inheritance and source precedence.
+- Parallel invocation isolation.
+- Legacy behavior without the new adapter.
+- Missing active-context behavior.
 
-Do not implement the migration yet.
+Run focused tests and the affected module.
+
+Keep the production diff minimal.
+
 
