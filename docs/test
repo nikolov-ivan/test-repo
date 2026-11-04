@@ -1,36 +1,60 @@
 
-Review how existing production listeners access
-configuration during TestNG lifecycle callbacks.
+Investigate configuration loading during real
+TestNG 7.12.0 execution.
 
-Focus on:
-- Screenshot listeners.
-- Reporting listeners.
-- Retry-related listeners.
-- The existing properties manager.
-- The existing managed callback mechanism.
+Focus on the existing framework parameter layer
+loader and lifecycle adapter.
 
-Determine:
+Do not modify production code yet.
 
-1. Which callbacks read configuration.
-2. Which callbacks currently have an active
-   configuration context.
-3. Which callbacks run outside managed activation.
-4. Whether replacing the existing properties
-   manager with a compatibility facade could
-   cause incorrect ROOT fallback.
-5. Which existing listener is safest to migrate first.
-6. The smallest change required to guarantee
-   correct invocation-specific configuration.
+Create one focused integration test using
+a suite with two parallel XML test elements.
 
-Requirements:
-- Do not modify production code.
-- Do not introduce new abstractions.
-- Do not change listener registration.
-- Preserve existing listener execution ordering.
-- Keep core independent of TestNG.
+Configure:
+- One shared suite-level property.
+- Different test-level values for each XML test.
+- A class-level override where supported.
 
-Report the findings and recommend the next
-smallest implementation step.
+Verify:
+
+1. The correct configuration context exists
+   for every lifecycle scope.
+
+2. XML parameters are available in the expected
+   configuration layers.
+
+3. Effective configuration resolution respects
+   source priority and scope inheritance.
+
+4. Parallel test elements never see each
+   other's configuration values.
+
+5. Missing values are reported explicitly,
+   without silently accepting ROOT fallback.
+
+6. Use XML-defined expected values as the
+   source of truth.
+
+7. The existing properties manager may be
+   observed for diagnostics, but must not be
+   treated as the correctness oracle.
+
+8. Reuse the existing integration test
+   infrastructure and registration mechanism.
+
+9. Do not register a duplicate lifecycle adapter.
+
+10. Do not modify legacy listeners or the
+    existing properties manager.
+
+Report:
+- Which XML parameters are already loaded.
+- Which lifecycle scopes are missing layers.
+- The exact missing integration point.
+- The smallest production change needed.
+
+Do not implement the fix yet.
+
 
 
 
