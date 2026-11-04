@@ -1,48 +1,61 @@
 
-Proceed with option A, with these additional
-architectural constraints:
+Migrate only the existing
+PropertiesManager.setProperty(String, String)
+method to the hierarchical configuration engine.
 
-1. Preserve the existing PropertiesManager
-   public API and all method signatures.
+Requirements:
 
-2. Use ThreadLocal only for an activation-scoped
-   binding to the existing configuration engine.
-   Never store mutable Properties or snapshots
-   in ThreadLocal.
+1. Preserve the existing class and all public
+   method signatures exactly as they are.
 
-3. Bind the exact context ID and its owning
-   read-only configuration resolver.
+2. When an active configuration binding exists,
+   write to the PROGRAMMATIC configuration layer
+   of the exact active context.
 
-4. Support nested activations correctly:
-   closing an inner activation must restore
-   the previous binding.
+3. Use the existing configuration updater,
+   coordinator and context infrastructure.
 
-5. Always restore or remove the binding in
-   finally, including exception paths.
+4. Do not write to legacy ThreadLocal properties
+   when the new context is active.
 
-6. Never resolve a context through a different
-   coordinator or registry.
+5. When no new configuration binding exists,
+   preserve the existing legacy behavior.
 
-7. Never silently fall back to ROOT or stale
-   configuration when an active binding is invalid.
+6. Preserve the established configuration
+   source priority. PROGRAMMATIC must not
+   override JVM_SYSTEM_PROPERTIES or
+   EXPLICIT_OVERRIDE.
 
-8. Preserve legacy behavior when the new
-   configuration integration is not active.
+7. Ensure a write is visible to subsequent
+   reads when no higher-priority layer
+   overrides that key.
 
-9. Keep the core independent of TestNG.
+8. Preserve isolation across parallel
+   invocations and independent coordinators.
 
-10. Do not modify other public PropertiesManager
-    methods or production listeners yet.
+9. Reject writes to released or invalid contexts.
 
-11. Do not introduce another configuration store
-    or globally shared coordinator.
+10. Preserve nested activation behavior.
 
-First implement and test only
-PropertiesManager.getProperty(String).
+11. Do not change getProperty or any other
+    public method.
 
-Verify nested activations, parallel threads,
-multiple independent coordinators, exceptions,
-context release and legacy compatibility.
+12. Do not modify existing production listeners.
+
+13. Do not create new configuration stores
+    or global mutable state.
+
+14. Keep the core independent of TestNG.
+
+Add focused unit and integration tests covering
+read-after-write, source precedence, inheritance,
+parallel isolation, nested activations, invalid
+contexts and legacy compatibility.
+
+Run the affected tests and full Maven reactor.
+
+Keep production changes minimal and report
+the exact results.
 
 
 
