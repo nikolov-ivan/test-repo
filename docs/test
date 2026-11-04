@@ -1,67 +1,70 @@
 
-Implement only TEST-level XML parameter loading
-in the existing TestNG lifecycle integration.
+Implement only CLASS-level XML parameter loading
+in the existing TestNG lifecycle adapter.
 
-SUITE-level loading is already implemented
-and tested.
+SUITE and TEST parameter loading are already
+implemented and tested.
 
 Requirements:
 
-1. When a new TEST configuration context is
-   created, load its local XML test parameters.
+1. When a CLASS configuration context is first
+   created, load its local XML class parameters.
 
-2. Obtain them from the corresponding XmlTest
-   using getLocalParameters().
+2. Use the matching XmlClass.getLocalParameters().
 
-3. Reuse the existing framework parameter
-   layer loader and configuration layer store.
+3. Reuse the existing framework parameter loader
+   and configuration layer store.
 
 4. Register one FRAMEWORK_PARAMETERS layer
-   owned by the TEST context.
+   belonging to the CLASS context.
 
-5. Preserve inherited SUITE configuration values.
+5. Preserve inheritance from TEST and SUITE.
 
-6. Ensure TEST parameters override conflicting
-   SUITE parameters within the same source priority.
+6. Within the same source priority, local CLASS
+   parameters must override conflicting TEST
+   and SUITE parameters.
 
-7. Preserve PROGRAMMATIC overrides taking
-   precedence over XML parameters.
+7. Preserve PROGRAMMATIC source precedence.
 
-8. Ensure parallel XML test elements never
-   share or overwrite each other's layers.
+8. Do not copy inherited parameters into the
+   CLASS layer.
 
-9. Make context creation and layer registration
-   atomic from the perspective of other threads.
+9. Ensure correct XmlClass matching when
+   different XML tests reference the same
+   Java class.
 
-10. Do not reload layers for existing contexts.
+10. Never silently select the wrong XmlClass
+    when the mapping is ambiguous.
 
-11. Do not register layers for empty local
-    parameter maps.
+11. Ensure atomic context creation and layer
+    registration.
 
-12. Preserve lifecycle cleanup and prevent
-    orphan configuration layers.
+12. Do not duplicate layers or reload existing
+    contexts.
 
-13. Do not implement CLASS or METHOD loading yet.
+13. Preserve parallel isolation and cleanup.
 
-14. Do not modify the resolver, legacy properties
-    manager or existing production listeners.
+14. Do not implement METHOD-level loading yet.
 
-Extend the existing real TestNG integration tests.
+15. Do not modify the resolver, legacy properties
+    manager or existing listeners.
 
-Verify:
+Extend the real TestNG integration tests to verify:
+
 - Two parallel XML test elements.
-- Different environment values per test.
-- Shared SUITE parameter inheritance.
-- TEST-level precedence over SUITE values.
-- Programmatic override precedence.
-- No cross-test configuration leakage.
-- Correct cleanup of TEST layers.
-- No duplicate layers.
+- Multiple classes in each test.
+- Different CLASS-level values.
+- Correct SUITE -> TEST -> CLASS inheritance.
+- CLASS override precedence.
+- No leakage between sibling classes.
+- No leakage between parallel tests.
+- Correct cleanup of CLASS layers.
 
-Run focused tests and the complete TestNG module.
+Run the focused tests and complete TestNG module.
 
-Report remaining missing configuration scopes
-without weakening the diagnostic assertions.
+Report exact results and remaining missing scopes.
+Keep the change minimal.
+
 
 
 
