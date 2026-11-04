@@ -1,25 +1,47 @@
 
-Investigate the "Native Injection is NOT supported"
-failure in the full Maven build.
-
-Check all @BeforeSuite and @AfterSuite methods
-for unsupported native parameter injection.
-
-Pay special attention to ITestContext parameters.
-
-For each affected method:
-- Identify the unsupported parameter.
-- Explain how it is currently used.
-- Recommend the smallest compatible replacement.
-- Preserve suite-level initialization semantics.
-- Prefer existing suite lifecycle infrastructure.
+Validate the proposed compatibility fix for
+unsupported ITestContext injection in
+@BeforeSuite and @AfterSuite.
 
 Do not modify production code yet.
-Do not change TestNG versions.
-Do not suppress or exclude failing tests.
 
-Report the exact affected methods and
-the recommended changes.
+Create a real TestNG 7.12.0 lifecycle probe.
+
+Verify:
+
+1. Whether Reporter.getCurrentTestResult()
+   is available during @BeforeSuite.
+
+2. Whether getTestContext() returns the
+   correct owning suite.
+
+3. Whether the same behavior is reliable
+   during @AfterSuite.
+
+4. Test one suite with two parallel <test>
+   elements having different XML parameters.
+
+5. Verify suite initialization runs exactly once.
+
+6. Verify suite teardown runs exactly once.
+
+7. Inspect whether the proposed wrapper preserves
+   existing overridden setup and teardown methods.
+
+8. Compare this approach with obtaining ISuite
+   from the existing suite lifecycle listener.
+
+9. Identify whether suite-specific initialization
+   can use the existing configuration coordinator
+   without depending on Reporter.
+
+Do not change TestNG versions.
+Do not modify existing assertions.
+Do not modify unrelated modules.
+
+Report the safest minimal compatibility fix
+and any limitations before implementing it.
+
 
 
 
