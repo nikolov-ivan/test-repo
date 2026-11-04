@@ -1,63 +1,69 @@
 
-Investigate and test invocation-specific
-configuration access from an independently
-registered TestNG ITestListener.
+Implement the smallest safe read-only configuration
+access mechanism for independent TestNG listeners.
 
-The existing lifecycle adapter already stores
-the invocation context UUID in an ITestResult
-attribute.
-
-Goal:
-An independent listener must resolve the
-correct configuration during onTestSuccess,
-onTestFailure and onTestSkipped, even when
-there is no active ScopeCursor binding.
+The lifecycle adapter already stores the
+INVOCATION context UUID in ITestResult.
 
 Requirements:
 
-1. Create a focused real TestNG 7.12.0
-   integration test.
+1. Expose a read-only Supplier<ConfigurationSnapshot>
+   through a dedicated ITestResult attribute.
 
-2. Use two parallel XML test elements with
-   different environments and configuration
-   values.
+2. Attach the supplier when the INVOCATION context
+   is established and the target TEST result is
+   available.
 
-3. Register an independent ITestListener
-   alongside the existing lifecycle adapter.
+3. The supplier must resolve the current snapshot
+   using the existing coordinator and invocation UUID.
 
-4. Inspect the invocation UUID stored in
-   each ITestResult.
+4. Do not cache the snapshot prematurely.
+   Invocation-specific overrides made during
+   setup or test execution must remain visible.
 
-5. Verify whether the listener can resolve
-   the exact invocation configuration snapshot
-   without using ThreadLocal state.
+5. Do not activate ScopeCursor when resolving.
 
-6. Verify that the invocation context remains
-   registered while the callback executes.
+6. Do not expose the coordinator, registry,
+   mutable layers or write operations.
 
-7. Verify that each callback observes the
-   correct XML and environment values.
+7. Preserve the existing invocation UUID attribute.
 
-8. Verify no cross-test or cross-thread leakage.
+8. Keep the supplier available through
+   onTestSuccess, onTestFailure and onTestSkipped.
 
-9. Test successful, failed and skipped methods.
+9. After context release, accessing the supplier
+   must fail clearly rather than return ROOT values
+   or stale configuration.
 
-10. Check listener ordering independence.
+10. Do not introduce static global mutable state.
 
-11. Do not change production code yet.
+11. Do not change listener registration or
+    callback ordering.
 
-12. Do not modify the existing properties
-    manager or legacy listeners.
+12. Keep the core independent of TestNG.
 
-13. Keep the core independent of TestNG.
+13. Do not modify the existing properties manager
+    or legacy listeners.
 
-Report:
-- Which scenarios already work.
-- Which scenarios fail.
-- Whether the current attribute is sufficient.
-- The smallest safe integration change needed.
+Update the existing real integration test:
 
-Do not implement the fix yet.
+- Remove all reflection-based coordinator access.
+- Read configuration using the public result attribute.
+- Verify success, failure and skipped callbacks.
+- Verify parallel invocation isolation.
+- Verify updated overrides are visible.
+- Verify the absence of active ScopeCursor bindings.
+- Verify behavior after invocation cleanup.
+- Check both listener registration orders.
+
+Also verify how missing attributes are handled
+when a callback has no valid invocation context.
+
+Run the focused tests and full TestNG module.
+
+Report exact results and any remaining limitations.
+Keep production changes minimal.
+
 
 
 
