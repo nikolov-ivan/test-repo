@@ -1,39 +1,59 @@
 
-Analyze the existing
-PropertiesManager.setProperties(Properties)
-method before migrating it.
+Migrate only the existing
+PropertiesManager.setProperties(Properties) method.
 
-Requirements:
+Preserve its public signature and all other
+public APIs.
 
-1. Preserve the existing class and every
-   public method signature exactly.
+Important: Do not compare the supplied Properties
+only against the current effective snapshot.
+That can accidentally remove existing
+PROGRAMMATIC overrides.
 
-2. Inspect the current setProperties behavior:
-   replacement, merging, null handling and
-   interaction with getProperties().
+Required behavior with an active context:
 
-3. Find all production usages.
+1. Treat setProperties as replacement, not merge,
+   of the current context's PROGRAMMATIC values.
 
-4. Determine how to support the new
-   configuration engine without promoting
-   inherited snapshot values into
-   PROGRAMMATIC overrides unintentionally.
+2. Do not promote inherited BASE, ENVIRONMENT,
+   SUITE, TEST or CLASS values into local overrides.
 
-5. Preserve source priorities, scope isolation
-   and existing legacy behavior.
+3. Preserve effective values when passing an
+   unchanged copy returned by getProperties().
 
-6. Do not introduce another configuration store
-   or global mutable state.
+4. Support clearing current PROGRAMMATIC overrides
+   with an empty Properties object.
 
-7. Keep core independent of TestNG.
+5. Do not change parent or sibling contexts.
 
-8. Do not modify production code yet.
+6. Make the replacement atomic.
 
-9. Run the full Maven reactor to verify
-   the previous getProperties migration.
+7. Reject null explicitly in the new path.
 
-Report the smallest safe implementation
-strategy and exact regression results.
+8. Preserve legacy behavior when no new
+   configuration binding is active.
+
+9. Keep the core independent of TestNG.
+
+10. Do not modify other methods or listeners.
+
+Before implementing, create focused tests for:
+- Existing PROGRAMMATIC overrides
+- getProperties() followed by setProperties()
+- Empty replacement
+- Inherited values
+- Higher-priority JVM and explicit overrides
+- Parallel invocations
+- Nested contexts
+- Invalid or released contexts
+
+If any required behavior cannot be preserved
+without ambiguity, report it instead of
+silently changing semantics.
+
+Implement the smallest safe change, run all
+affected tests and report compatibility differences.
+
 
 
 
