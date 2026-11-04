@@ -1,81 +1,24 @@
 
-Implement the smallest safe integration of BASE
-and JVM_SYSTEM_PROPERTIES configuration sources.
+Proceed with option A, but preserve backward compatibility.
 
-The existing TestNG lifecycle adapter already
-loads XML parameters at SUITE, TEST, CLASS
-and INVOCATION scopes.
-
-The missing sources are BASE and
-JVM_SYSTEM_PROPERTIES.
+Before changing the resolver, verify the legacy
+environment resource naming convention.
 
 Requirements:
+- Reuse the existing environment loading components.
+- Preserve support for the legacy environments/ path.
+- Do not break existing supported resource locations.
+- Preserve environment selection at each scope.
+- Do not change configuration source priorities.
+- Do not hardcode a specific environment name.
+- Keep the fix minimal and focused.
 
-1. Reuse the existing classpath properties
-   source and configuration file layer loader.
+After the fix, complete BASE and JVM layer
+initialization and run the relevant tests.
 
-2. Load the existing test.config.properties
-   into the ROOT configuration context as BASE.
+Do not modify the existing properties manager
+or production listeners.
 
-3. Reuse the existing JVM system property
-   layer loader.
-
-4. Load JVM system properties into ROOT using
-   the JVM_SYSTEM_PROPERTIES source type.
-
-5. Preserve the established source priority:
-   BASE < ENVIRONMENT < FRAMEWORK_PARAMETERS
-   < PROGRAMMATIC < JVM_SYSTEM_PROPERTIES
-   < EXPLICIT_OVERRIDE.
-
-6. Ensure ROOT layers are initialized before
-   child contexts resolve configuration.
-
-7. Initialize each layer only once per
-   owned ROOT context.
-
-8. Preserve thread safety and atomic visibility
-   during initialization.
-
-9. Do not modify externally owned ROOT contexts
-   without explicit authorization.
-
-10. Preserve existing environment selection
-    and XML parameter inheritance.
-
-11. Do not change the configuration resolver.
-
-12. Do not modify the existing properties manager.
-
-13. Do not migrate existing listeners yet.
-
-14. Do not introduce global mutable state,
-    another coordinator or another registry.
-
-Add focused integration tests verifying:
-
-- BASE properties are loaded into ROOT.
-- JVM system properties are available.
-- JVM values override XML and PROGRAMMATIC
-  values for the same key.
-- EXPLICIT_OVERRIDE remains the highest priority.
-- Child contexts inherit ROOT configuration.
-- Parallel invocations remain isolated.
-- No duplicate layers are created.
-- Repeated executions use independent ROOTs.
-- Configuration layers are removed during cleanup.
-
-Use explicit test-defined expected values,
-not the existing properties manager as the
-correctness oracle.
-
-Run the focused tests, the complete TestNG
-module and the Maven reactor build.
-
-Report exact results and any compatibility
-issues discovered.
-
-Keep changes minimal and focused.
 
 
 
