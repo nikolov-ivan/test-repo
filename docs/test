@@ -1,58 +1,40 @@
 
-Migrate only the existing
-PropertiesManager.setProperties(Properties) method.
+Review the completed setProperties(Properties)
+migration without modifying production code.
 
-Preserve its public signature and all other
-public APIs.
+Verify these cases:
 
-Important: Do not compare the supplied Properties
-only against the current effective snapshot.
-That can accidentally remove existing
-PROGRAMMATIC overrides.
+1. An existing local override remains intact
+   after getProperties() followed by
+   setProperties() with unchanged values.
 
-Required behavior with an active context:
+2. Replacing with an empty Properties object
+   removes only the current context's
+   PROGRAMMATIC overrides.
 
-1. Treat setProperties as replacement, not merge,
-   of the current context's PROGRAMMATIC values.
+3. Inherited values remain available.
 
-2. Do not promote inherited BASE, ENVIRONMENT,
-   SUITE, TEST or CLASS values into local overrides.
+4. Replacing a local override with a value
+   equal to its parent's value has explicitly
+   documented semantics.
 
-3. Preserve effective values when passing an
-   unchanged copy returned by getProperties().
+5. Future parent changes behave consistently
+   with those semantics.
 
-4. Support clearing current PROGRAMMATIC overrides
-   with an empty Properties object.
+6. Parallel invocations and nested contexts
+   remain isolated.
 
-5. Do not change parent or sibling contexts.
+7. Existing legacy tests retain their
+   meaningful original assertions.
 
-6. Make the replacement atomic.
+8. No public method signatures have changed.
 
-7. Reject null explicitly in the new path.
+Run focused tests and the full Maven reactor.
+Report exact results and any unresolved
+compatibility differences.
 
-8. Preserve legacy behavior when no new
-   configuration binding is active.
+Do not modify production code.
 
-9. Keep the core independent of TestNG.
-
-10. Do not modify other methods or listeners.
-
-Before implementing, create focused tests for:
-- Existing PROGRAMMATIC overrides
-- getProperties() followed by setProperties()
-- Empty replacement
-- Inherited values
-- Higher-priority JVM and explicit overrides
-- Parallel invocations
-- Nested contexts
-- Invalid or released contexts
-
-If any required behavior cannot be preserved
-without ambiguity, report it instead of
-silently changing semantics.
-
-Implement the smallest safe change, run all
-affected tests and report compatibility differences.
 
 
 
