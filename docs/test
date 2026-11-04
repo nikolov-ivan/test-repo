@@ -1,39 +1,86 @@
 
-Review the completed setProperties(Properties)
-migration without modifying production code.
+Complete the migration of the existing
+PropertiesManager to the hierarchical
+configuration engine.
 
-Verify these cases:
+The foundational integration is already implemented
+and tested. Do not redesign it.
 
-1. An existing local override remains intact
-   after getProperties() followed by
-   setProperties() with unchanged values.
+GOAL:
+Migrate all remaining public methods in one pass.
 
-2. Replacing with an empty Properties object
-   removes only the current context's
-   PROGRAMMATIC overrides.
+STRICT COMPATIBILITY:
+- Keep the existing PropertiesManager class.
+- Preserve every existing public method name,
+  signature, return type and static modifier.
+- Do not remove public methods.
+- Existing consumer code must compile unchanged.
+- Preserve legacy behavior when no active
+  configuration binding exists.
 
-3. Inherited values remain available.
+IMPLEMENTATION:
+1. Inspect all remaining public methods and
+   their usages before changing them.
 
-4. Replacing a local override with a value
-   equal to its parent's value has explicitly
-   documented semantics.
+2. Route configuration reads through the
+   active context's resolved snapshot.
 
-5. Future parent changes behave consistently
-   with those semantics.
+3. Route configuration writes through the
+   appropriate existing configuration updater.
 
-6. Parallel invocations and nested contexts
-   remain isolated.
+4. Preserve source precedence and scope
+   inheritance.
 
-7. Existing legacy tests retain their
-   meaningful original assertions.
+5. Reuse the existing binding, resolver,
+   coordinator and layer store.
 
-8. No public method signatures have changed.
+6. Avoid duplicated configuration storage
+   when the new engine is active.
 
-Run focused tests and the full Maven reactor.
-Report exact results and any unresolved
-compatibility differences.
+7. Preserve existing method-specific semantics,
+   including defaults, empty values, nulls
+   and environment selection.
 
-Do not modify production code.
+8. Do not silently promote inherited values
+   into local overrides.
+
+9. Handle reset and reload methods carefully.
+   Do not destroy active contexts or parent
+   configuration layers.
+
+10. Do not change already migrated methods
+    unless necessary to fix a demonstrated defect.
+
+11. Do not modify production listeners,
+    TestNG lifecycle integration or module
+    dependencies.
+
+12. Keep core independent of TestNG.
+
+TESTING:
+- Add parameterized tests for the remaining
+  methods and their expected behavior.
+- Test ROOT, SUITE, TEST, CLASS and INVOCATION.
+- Test parallel execution and nested activations.
+- Test source precedence, inheritance and
+  legacy compatibility.
+- Test invalid and released contexts.
+- Run the full Maven reactor.
+
+IMPORTANT:
+If any method cannot preserve its previous
+semantics under the new architecture, do not
+invent behavior. Leave that method unchanged,
+report the exact incompatibility, and continue
+migrating the other methods.
+
+DELIVERABLES:
+- List of migrated methods.
+- List of methods left unchanged and why.
+- Compatibility differences.
+- Exact test results.
+- Minimal production changes.
+
 
 
 
