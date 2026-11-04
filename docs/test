@@ -1,41 +1,60 @@
 
 
 
-Investigate and update only the existing real
-TestNG integration test that verifies correct
-context activation across lifecycle methods.
 
-The implementation now releases CLASS and TEST
-contexts during onFinish(ITestContext).
+Implement the smallest safe SUITE context cleanup.
+
+The existing lifecycle integration already releases
+INVOCATION, CLASS and TEST contexts when their
+owning TestNG test context finishes.
 
 Requirements:
 
-1. Identify the exact Optional that is empty
-   at the reported failing line.
+1. Reuse the existing lifecycle listener,
+   coordinator and context registry.
 
-2. Verify SUITE, TEST, CLASS and INVOCATION
-   contexts are correctly activated DURING
-   their corresponding lifecycle callbacks.
+2. Handle ISuiteListener.onFinish(ISuite).
 
-3. Capture necessary context identities and
-   configuration values while they are valid.
+3. Resolve the SUITE context owned by the
+   finishing TestNG suite.
 
-4. Do not require TEST or CLASS contexts to
-   remain registered after TestNG finishes.
+4. Verify all child TEST contexts have already
+   been released.
 
-5. After execution, verify:
-   - INVOCATION contexts are released.
-   - CLASS contexts are released.
-   - TEST contexts are released.
-   - SUITE and ROOT remain registered.
-   - No orphan layers remain for released contexts.
+5. Release the SUITE context through the
+   existing lifecycle coordinator.
 
-6. Preserve all meaningful context identity,
-   inheritance and configuration assertions.
+6. Remove its ownership mapping and
+   configuration layers.
 
-7. Do not change production code.
-8. Do not modify other tests.
-9. Do not weaken assertions to make the test pass.
+7. Never release a SUITE context with live
+   children or active bindings.
 
-Run the updated test, then the complete module
-3 times and report the results.
+8. Preserve fail-fast behavior for invalid
+   lifecycle transitions.
+
+9. Keep ROOT registered. ROOT cleanup will
+   be handled separately.
+
+10. Do not introduce new global state or
+    another listener coordinator.
+
+11. Do not modify legacy listeners.
+
+Add real TestNG 7.12.0 integration tests verifying:
+
+- One suite containing two parallel test elements.
+- Both test elements share the same SUITE context.
+- CLASS, TEST and INVOCATION cleanup occurs first.
+- The SUITE context remains available until
+  suite completion.
+- The SUITE context is released at onFinish(ISuite).
+- ROOT remains registered.
+- No orphan layers or ownership mappings remain.
+- Two independent suites cannot release each
+  other's contexts.
+
+Run the relevant integration tests and the
+complete module test suite.
+
+Report failures without weakening assertions.
