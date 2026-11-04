@@ -1,52 +1,25 @@
 
-Enable production ServiceLoader registration for
-the existing TestNG lifecycle adapter.
+Investigate the "Native Injection is NOT supported"
+failure in the full Maven build.
 
-Requirements:
+Check all @BeforeSuite and @AfterSuite methods
+for unsupported native parameter injection.
 
-1. Register the existing adapter through
-   META-INF/services/org.testng.ITestNGListener
-   in the TestNG integration module.
+Pay special attention to ITestContext parameters.
 
-2. Reuse the existing no-argument constructor.
+For each affected method:
+- Identify the unsupported parameter.
+- Explain how it is currently used.
+- Recommend the smallest compatible replacement.
+- Preserve suite-level initialization semantics.
+- Prefer existing suite lifecycle infrastructure.
 
-3. Ensure exactly one adapter instance owns
-   lifecycle state per TestNG execution.
+Do not modify production code yet.
+Do not change TestNG versions.
+Do not suppress or exclude failing tests.
 
-4. Do not register the adapter through @Listeners.
+Report the exact affected methods and
+the recommended changes.
 
-5. Prevent duplicate registration when another
-   instance is registered programmatically.
-
-6. Preserve the existing ROOT ownership and
-   single-use lifecycle behavior.
-
-7. Do not modify existing legacy listeners.
-
-8. Do not migrate the configuration API yet.
-
-9. Keep core independent of TestNG.
-
-10. Do not introduce static singleton state.
-
-Verification:
-
-- Run normal Maven TestNG execution.
-- Verify automatic discovery works.
-- Verify one suite with multiple parallel tests.
-- Verify correct context creation and cleanup.
-- Verify no duplicate lifecycle callbacks.
-- Verify no orphan contexts or configuration layers.
-- Verify existing legacy listeners still execute.
-- Run the complete TestNG module three times.
-
-If global registration causes existing tests
-to fail, investigate the exact interaction
-before modifying tests or production behavior.
-
-Do not weaken assertions or suppress failures.
-
-Report exact test results and all compatibility
-issues discovered.
 
 
