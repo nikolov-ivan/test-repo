@@ -3,40 +3,37 @@
 
 
 
-Investigate the four failing tests introduced
-after implementing SUITE context cleanup.
+Fix all four failing integration tests affected
+by the new SUITE context cleanup lifecycle.
 
-Do not modify any code yet.
+Requirements:
 
-For each failing test:
+1. Preserve all meaningful lifecycle, UUID,
+   configuration and concurrency assertions.
 
-1. Identify the exact failing assertion.
-2. Record the expected and actual values.
-3. Determine whether the test expects the SUITE
-   context to remain registered after suite completion.
-4. Verify whether onFinish(ISuite) is correctly
-   forwarded by the test harness.
-5. Verify the actual lifecycle callback order.
-6. Check whether the new cleanup releases any
-   context prematurely.
-7. Check for duplicate or missing cleanup calls.
+2. Verify SUITE remains available and active
+   during @AfterSuite.
 
-Classify each failure as:
-- Obsolete lifecycle assertion
-- Test harness issue
-- Actual production defect
+3. Verify SUITE is released after
+   ISuiteListener.onFinish(ISuite).
 
-Preserve these required guarantees:
-- SUITE remains available throughout @AfterSuite.
-- Parallel TEST contexts remain isolated.
-- No parent is released while children are alive.
-- ROOT is not released by SUITE cleanup.
-- No orphan configuration layers remain.
+4. Verify ROOT remains registered.
 
-Return a concise table with:
-Test name, failure reason, classification
-and recommended minimal correction.
+5. Verify all INVOCATION, CLASS, TEST and SUITE
+   contexts are properly released.
 
-Do not modify production code.
-Do not modify tests.
-Do not weaken assertions.
+6. Verify ownership mappings and configuration
+   layers are cleaned up.
+
+7. Do not weaken assertions or hide failures.
+
+8. Do not modify production code unless an actual
+   production defect is discovered. Report such
+   defects before making changes.
+
+9. Run the entire TestNG module 3 times.
+
+10. Report total tests, passed, failed and skipped
+    for each execution.
+
+Keep changes focused on the affected tests.
