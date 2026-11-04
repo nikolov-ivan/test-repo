@@ -1,23 +1,66 @@
 
-Proceed with option A, but preserve backward compatibility.
+Verify ENVIRONMENT configuration resolution
+during real parallel TestNG 7.12.0 execution.
 
-Before changing the resolver, verify the legacy
-environment resource naming convention.
+The lifecycle adapter already loads BASE,
+JVM system properties and XML parameters
+at all supported scopes.
 
-Requirements:
-- Reuse the existing environment loading components.
-- Preserve support for the legacy environments/ path.
-- Do not break existing supported resource locations.
-- Preserve environment selection at each scope.
-- Do not change configuration source priorities.
-- Do not hardcode a specific environment name.
-- Keep the fix minimal and focused.
+The existing environment selection and
+composition components must be reused.
 
-After the fix, complete BASE and JVM layer
-initialization and run the relevant tests.
+Do not modify production code yet.
 
-Do not modify the existing properties manager
-or production listeners.
+Create one focused integration test with:
+
+- ROOT selecting environment=acc by default.
+- Two parallel XML test elements.
+- TEST A selecting environment=dev.
+- TEST B selecting environment=uat.
+- Different properties in the two environment files.
+- At least one property shared by both files
+  with different values.
+
+Verify:
+
+1. Each TEST selects its own environment file.
+
+2. Environment values are available in child
+   CLASS and INVOCATION contexts.
+
+3. No environment values leak between parallel
+   TEST contexts.
+
+4. XML parameters override ENVIRONMENT values
+   according to the established source priority.
+
+5. JVM system properties retain their priority.
+
+6. Environment changes at a more specific
+   scope do not retain stale values from the
+   previously selected environment.
+
+7. Missing environment files produce the
+   documented behavior.
+
+8. No duplicate environment layers remain.
+
+9. Context cleanup removes all associated layers.
+
+10. The existing configuration resolver and
+    environment composer are reused.
+
+Do not modify the legacy properties manager.
+Do not modify production listeners.
+Do not introduce new configuration abstractions.
+
+Report:
+- Exact test results.
+- Whether environment selection works correctly.
+- Any remaining integration gaps.
+- The smallest required fix, if one exists.
+
+Do not implement fixes yet.
 
 
 
