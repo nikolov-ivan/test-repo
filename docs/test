@@ -1,61 +1,52 @@
 
 Migrate only the existing
-PropertiesManager.setProperty(String, String)
-method to the hierarchical configuration engine.
+PropertiesManager.getProperties() method
+to the hierarchical configuration engine.
 
 Requirements:
 
-1. Preserve the existing class and all public
-   method signatures exactly as they are.
+1. Preserve the existing public method signature
+   and return type exactly.
 
 2. When an active configuration binding exists,
-   write to the PROGRAMMATIC configuration layer
-   of the exact active context.
+   resolve the current effective snapshot.
 
-3. Use the existing configuration updater,
-   coordinator and context infrastructure.
+3. Return the resolved values as a new independent
+   java.util.Properties object.
 
-4. Do not write to legacy ThreadLocal properties
-   when the new context is active.
+4. Never expose or modify internal configuration
+   layers, snapshots or shared mutable state.
 
-5. When no new configuration binding exists,
-   preserve the existing legacy behavior.
+5. Ensure getProperties() and getProperty(key)
+   return consistent values for the same context.
 
-6. Preserve the established configuration
-   source priority. PROGRAMMATIC must not
-   override JVM_SYSTEM_PROPERTIES or
-   EXPLICIT_OVERRIDE.
+6. Respect all existing source priorities,
+   inheritance and programmatic updates.
 
-7. Ensure a write is visible to subsequent
-   reads when no higher-priority layer
-   overrides that key.
+7. Preserve existing legacy behavior when
+   no new configuration binding is active.
 
-8. Preserve isolation across parallel
-   invocations and independent coordinators.
+8. Before changing the implementation, inspect
+   all usages of getProperties() and identify
+   any callers relying on mutation of the
+   returned object. Report compatibility risks.
 
-9. Reject writes to released or invalid contexts.
+9. Preserve parallel isolation, nested
+   activations and independent coordinators.
 
-10. Preserve nested activation behavior.
+10. Do not change any other public methods,
+    production listeners or lifecycle behavior.
 
-11. Do not change getProperty or any other
-    public method.
+11. Do not introduce global mutable state.
 
-12. Do not modify existing production listeners.
+12. Keep the core independent of TestNG.
 
-13. Do not create new configuration stores
-    or global mutable state.
+Add focused tests and run the complete
+affected modules.
 
-14. Keep the core independent of TestNG.
+Report exact results and compatibility risks.
+Keep production changes minimal.
 
-Add focused unit and integration tests covering
-read-after-write, source precedence, inheritance,
-parallel isolation, nested activations, invalid
-contexts and legacy compatibility.
-
-Run the affected tests and full Maven reactor.
-
-Keep production changes minimal and report
-the exact results.
 
 
 
