@@ -1,60 +1,48 @@
 
-Start the incremental migration of the existing
-PropertiesManager to the new hierarchical
-configuration system.
+Proceed with option A, with these additional
+architectural constraints:
 
-Focus only on the existing getProperty(String)
-read operation.
+1. Preserve the existing PropertiesManager
+   public API and all method signatures.
 
-Requirements:
+2. Use ThreadLocal only for an activation-scoped
+   binding to the existing configuration engine.
+   Never store mutable Properties or snapshots
+   in ThreadLocal.
 
-1. Keep the PropertiesManager class unchanged
-   as a public API.
+3. Bind the exact context ID and its owning
+   read-only configuration resolver.
 
-2. Preserve all existing public method names,
-   signatures, modifiers and return types.
+4. Support nested activations correctly:
+   closing an inner activation must restore
+   the previous binding.
 
-3. When a valid configuration context is active,
-   resolve the property through the existing
-   configuration engine and current snapshot.
+5. Always restore or remove the binding in
+   finally, including exception paths.
 
-4. Reuse the existing context, resolver and
-   configuration infrastructure.
-
-5. Do not create a second configuration store,
-   coordinator or global mutable singleton.
-
-6. Preserve legacy behavior for executions
-   that do not use the new lifecycle integration.
+6. Never resolve a context through a different
+   coordinator or registry.
 
 7. Never silently fall back to ROOT or stale
-   thread-local values when a scoped context
-   is expected.
+   configuration when an active binding is invalid.
 
-8. Do not attempt to infer an ITestResult inside
-   a zero-argument or key-only API.
+8. Preserve legacy behavior when the new
+   configuration integration is not active.
 
-9. Do not change setProperty, setProperties,
-   getProperties or other methods yet.
+9. Keep the core independent of TestNG.
 
-10. Do not modify production listeners.
+10. Do not modify other public PropertiesManager
+    methods or production listeners yet.
 
-11. Keep the core independent of TestNG.
+11. Do not introduce another configuration store
+    or globally shared coordinator.
 
-12. If the existing architecture cannot safely
-    locate the configuration engine from the
-    active context, identify the exact missing
-    dependency before implementing a workaround.
+First implement and test only
+PropertiesManager.getProperty(String).
 
-Add tests covering:
-- ROOT, SUITE, TEST, CLASS and INVOCATION reads.
-- Scope inheritance and source precedence.
-- Parallel invocation isolation.
-- Legacy behavior without the new adapter.
-- Missing active-context behavior.
+Verify nested activations, parallel threads,
+multiple independent coordinators, exceptions,
+context release and legacy compatibility.
 
-Run focused tests and the affected module.
-
-Keep the production diff minimal.
 
 
