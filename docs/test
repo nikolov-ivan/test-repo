@@ -1,70 +1,53 @@
 
-Complete the remaining configuration migration.
-
-The main PropertiesManager methods have already
-been migrated successfully.
-
-Focus on the remaining legacy loading and reset
-methods and their integration with BaseSuite
-and PropertiesLoadingStrategy.
+Fix the lifecycle cleanup gap when configuration
+loading fails during a TestNG setup callback.
 
 Requirements:
 
-1. Preserve all existing public classes,
-   methods and signatures.
+1. Reproduce the failure with a real TestNG
+   7.12.0 integration test using a missing
+   environment configuration file.
 
-2. Identify every legacy loading method still
-   invoked during an active configuration context.
+2. Inspect which lifecycle callbacks actually
+   execute when setup throws an exception.
 
-3. Ensure configuration loaded by these methods
-   is visible through the new configuration engine.
+3. Ensure that every activation created by the
+   adapter is closed, even if setup fails before
+   the normal cleanup callback.
 
-4. Use the correct configuration source and scope.
-   Do not place XML or environment configuration
-   into PROGRAMMATIC merely for convenience.
+4. Ensure that failed or abandoned invocation
+   contexts are eventually released safely.
 
-5. Reuse existing loaders, selectors, layers,
-   resolvers and lifecycle infrastructure.
+5. Never release a context while a valid
+   activation is still using it.
 
-6. Avoid loading the same configuration twice.
+6. Preserve the original configuration exception.
+   Cleanup failures must not hide the root cause.
 
-7. Preserve existing reload and reset semantics
-   wherever safely possible.
+7. Ensure subsequent tests on the same thread
+   cannot inherit stale context bindings.
 
-8. Do not create a second configuration store.
+8. Preserve correct behavior for parallel tests,
+   retries and skipped tests.
 
-9. Do not introduce global mutable state.
+9. Reuse the existing coordinator, lifecycle
+   manager and invocation tracker.
 
-10. Maintain backward compatibility for consumers
-    without an active configuration context.
+10. Do not introduce global mutable state or
+    redesign the configuration engine.
 
-11. Preserve parallel isolation and source priority.
+11. Preserve all public APIs and signatures.
 
 12. Keep the core independent of TestNG.
 
-13. Do not rewrite the architecture or existing
-    listeners.
+Add focused regression tests and execute the
+complete Maven reactor.
 
-14. If a legacy method is redundant because
-    the lifecycle adapter already loads its data,
-    prove this with tests before making it a
-    no-op.
+Report the exact test results and any remaining
+cleanup risks.
 
-Add integration tests covering the actual
-BaseSuite configuration loading flow,
-including environment selection and overrides.
+Keep the production changes minimal.
 
-Run the full Maven reactor.
-
-Report:
-- All migrated methods
-- Any remaining legacy-only methods
-- Configuration loading paths still using
-  ThreadLocal as their source of truth
-- Compatibility differences
-- Exact regression results
-
-Keep changes focused.
 
 
 
