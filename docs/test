@@ -1,25 +1,34 @@
 
-Perform a final regression verification of the
-recent TestNG lifecycle cleanup changes.
+Migrate JiraAnnotationListener to the new
+hierarchical configuration system.
 
-1. Run the complete Maven reactor three times.
-2. Verify configuration failure during setup.
-3. Verify retry, skipped tests and parallel execution.
-4. Verify no stale ActiveConfigurationBinding,
-   ScopeCursor state or orphan contexts remain.
-5. Verify cleanup never closes an activation
-   belonging to a different thread.
-6. Verify the original configuration exception
-   is preserved when cleanup also fails.
-7. Check that repeated executions do not reuse
-   stale contexts.
+Goals:
+- Preserve all existing public APIs.
+- Preserve existing Jira reporting behavior.
+- Remove reliance on legacy ThreadLocal
+  configuration when the new engine is active.
+- Resolve configuration from the correct
+  TestNG lifecycle context.
+- Support independently registered listeners.
+- Do not depend on listener execution order.
+- Do not silently fall back to ROOT when
+  invocation-specific configuration is required.
+- Preserve exception handling and cleanup.
+- Support parallel execution, retries and skips.
+- Keep core independent of TestNG.
 
-Do not modify production code unless a
-reproducible defect is found.
+Reuse the existing configuration access mechanism.
+Do not introduce new global state or another
+configuration store.
 
-Report exact results, remaining risks and
-whether the lifecycle implementation is ready
-for migration of legacy listeners.
+Add real TestNG 7.12.0 integration tests that
+verify listener behavior and configuration
+isolation.
+
+Run the affected tests and full Maven reactor.
+
+Report exact changes and results.
+
 
 
 
