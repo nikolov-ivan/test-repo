@@ -1,52 +1,26 @@
 
-Fix the lifecycle cleanup gap when configuration
-loading fails during a TestNG setup callback.
+Perform a final regression verification of the
+recent TestNG lifecycle cleanup changes.
 
-Requirements:
+1. Run the complete Maven reactor three times.
+2. Verify configuration failure during setup.
+3. Verify retry, skipped tests and parallel execution.
+4. Verify no stale ActiveConfigurationBinding,
+   ScopeCursor state or orphan contexts remain.
+5. Verify cleanup never closes an activation
+   belonging to a different thread.
+6. Verify the original configuration exception
+   is preserved when cleanup also fails.
+7. Check that repeated executions do not reuse
+   stale contexts.
 
-1. Reproduce the failure with a real TestNG
-   7.12.0 integration test using a missing
-   environment configuration file.
+Do not modify production code unless a
+reproducible defect is found.
 
-2. Inspect which lifecycle callbacks actually
-   execute when setup throws an exception.
+Report exact results, remaining risks and
+whether the lifecycle implementation is ready
+for migration of legacy listeners.
 
-3. Ensure that every activation created by the
-   adapter is closed, even if setup fails before
-   the normal cleanup callback.
-
-4. Ensure that failed or abandoned invocation
-   contexts are eventually released safely.
-
-5. Never release a context while a valid
-   activation is still using it.
-
-6. Preserve the original configuration exception.
-   Cleanup failures must not hide the root cause.
-
-7. Ensure subsequent tests on the same thread
-   cannot inherit stale context bindings.
-
-8. Preserve correct behavior for parallel tests,
-   retries and skipped tests.
-
-9. Reuse the existing coordinator, lifecycle
-   manager and invocation tracker.
-
-10. Do not introduce global mutable state or
-    redesign the configuration engine.
-
-11. Preserve all public APIs and signatures.
-
-12. Keep the core independent of TestNG.
-
-Add focused regression tests and execute the
-complete Maven reactor.
-
-Report the exact test results and any remaining
-cleanup risks.
-
-Keep the production changes minimal.
 
 
 
