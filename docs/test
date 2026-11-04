@@ -1,70 +1,83 @@
 
-Implement only CLASS-level XML parameter loading
-in the existing TestNG lifecycle adapter.
 
-SUITE and TEST parameter loading are already
-implemented and tested.
+
+Implement METHOD-level XML parameter loading
+using the existing INVOCATION configuration scope.
+
+SUITE, TEST and CLASS XML parameter loading
+are already implemented and tested.
 
 Requirements:
 
-1. When a CLASS configuration context is first
-   created, load its local XML class parameters.
+1. Obtain local method parameters from the
+   matching XmlInclude.getLocalParameters().
 
-2. Use the matching XmlClass.getLocalParameters().
+2. Reuse the existing framework parameter
+   loader, context registry and layer store.
 
-3. Reuse the existing framework parameter loader
-   and configuration layer store.
+3. Register the FRAMEWORK_PARAMETERS layer
+   on the correct INVOCATION context.
 
-4. Register one FRAMEWORK_PARAMETERS layer
-   belonging to the CLASS context.
+4. Preserve inheritance from CLASS, TEST
+   and SUITE contexts.
 
-5. Preserve inheritance from TEST and SUITE.
+5. METHOD parameters override parent XML
+   parameters within the same source priority.
 
-6. Within the same source priority, local CLASS
-   parameters must override conflicting TEST
-   and SUITE parameters.
+6. Preserve PROGRAMMATIC and EXPLICIT_OVERRIDE
+   source precedence.
 
-7. Preserve PROGRAMMATIC source precedence.
+7. Ensure @BeforeMethod, @Test and @AfterMethod
+   observe the same effective method configuration.
 
-8. Do not copy inherited parameters into the
-   CLASS layer.
+8. Ensure method parameters are available
+   before the corresponding @BeforeMethod body
+   starts, not only when @Test starts.
 
-9. Ensure correct XmlClass matching when
-   different XML tests reference the same
-   Java class.
+9. Inspect the actual TestNG 7.12.0 lifecycle
+   information used to identify the upcoming
+   test method. Do not confuse configuration
+   methods with the target test method.
 
-10. Never silently select the wrong XmlClass
-    when the mapping is ambiguous.
+10. Match the correct XmlInclude within the
+    owning XmlClass and XmlTest.
 
-11. Ensure atomic context creation and layer
-    registration.
+11. Never silently choose an ambiguous method
+    mapping or an incorrect XML test.
 
-12. Do not duplicate layers or reload existing
-    contexts.
+12. Preserve independent INVOCATION contexts
+    for parallel DataProvider executions,
+    repeated invocations and retries.
 
-13. Preserve parallel isolation and cleanup.
+13. Never duplicate layers or copy inherited
+    values into the method layer.
 
-14. Do not implement METHOD-level loading yet.
+14. Preserve cleanup, thread isolation and
+    existing lifecycle safety guarantees.
 
-15. Do not modify the resolver, legacy properties
-    manager or existing listeners.
+15. Do not modify the configuration resolver,
+    legacy properties manager or listeners.
 
-Extend the real TestNG integration tests to verify:
+Add real TestNG integration tests verifying:
 
-- Two parallel XML test elements.
-- Multiple classes in each test.
-- Different CLASS-level values.
-- Correct SUITE -> TEST -> CLASS inheritance.
-- CLASS override precedence.
-- No leakage between sibling classes.
-- No leakage between parallel tests.
-- Correct cleanup of CLASS layers.
+- Different methods with different XML values.
+- METHOD precedence over CLASS, TEST and SUITE.
+- Correct configuration in @BeforeMethod,
+  @Test and @AfterMethod.
+- Parallel DataProvider executions.
+- Retry behavior.
+- No configuration leakage between methods.
+- No duplicate or orphan layers.
 
-Run the focused tests and complete TestNG module.
+Run the relevant tests and the complete
+TestNG module.
 
-Report exact results and remaining missing scopes.
-Keep the change minimal.
+If the current lifecycle integration cannot
+identify the target method reliably before
+@BeforeMethod, report the exact blocker
+instead of implementing a partial solution.
 
+Keep production changes small and focused.
 
 
 
