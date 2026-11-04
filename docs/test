@@ -1,59 +1,57 @@
 
-Investigate configuration loading during real
-TestNG 7.12.0 execution.
+Implement only SUITE-level XML parameter loading
+in the existing TestNG lifecycle adapter.
 
-Focus on the existing framework parameter layer
-loader and lifecycle adapter.
+The framework parameter layer loader already
+exists but is not connected to production lifecycle
+context creation.
 
-Do not modify production code yet.
+Requirements:
 
-Create one focused integration test using
-a suite with two parallel XML test elements.
+1. When a new SUITE configuration context is
+   created, load its local XML suite parameters.
 
-Configure:
-- One shared suite-level property.
-- Different test-level values for each XML test.
-- A class-level override where supported.
+2. Use the existing FrameworkParameterLayerLoader.
 
-Verify:
+3. Register the values as a FRAMEWORK_PARAMETERS
+   layer belonging to that SUITE context.
 
-1. The correct configuration context exists
-   for every lifecycle scope.
+4. Apply the layer before the context is resolved
+   and used by lifecycle callbacks.
 
-2. XML parameters are available in the expected
-   configuration layers.
+5. Preserve existing source priority, including
+   PROGRAMMATIC overrides taking precedence
+   over FRAMEWORK_PARAMETERS.
 
-3. Effective configuration resolution respects
-   source priority and scope inheritance.
+6. Ensure context creation and parameter loading
+   are atomic from the perspective of other threads.
 
-4. Parallel test elements never see each
-   other's configuration values.
+7. Do not reload or overwrite the layer when
+   an existing SUITE context is retrieved.
 
-5. Missing values are reported explicitly,
-   without silently accepting ROOT fallback.
+8. Preserve correct inheritance and lifecycle
+   cleanup.
 
-6. Use XML-defined expected values as the
-   source of truth.
+9. Do not implement TEST, CLASS or METHOD loading yet.
 
-7. The existing properties manager may be
-   observed for diagnostics, but must not be
-   treated as the correctness oracle.
+10. Do not modify the resolver, legacy properties
+    manager or existing listeners.
 
-8. Reuse the existing integration test
-   infrastructure and registration mechanism.
+Add one focused real TestNG integration test
+verifying that:
 
-9. Do not register a duplicate lifecycle adapter.
+- A suite XML property becomes available in the
+  SUITE context.
+- Two parallel XML test elements inherit it.
+- An existing programmatic override retains
+  its defined priority.
+- No duplicate layers are registered.
+- Cleanup removes the suite parameter layer.
 
-10. Do not modify legacy listeners or the
-    existing properties manager.
+Run the focused tests and report the result.
 
-Report:
-- Which XML parameters are already loaded.
-- Which lifecycle scopes are missing layers.
-- The exact missing integration point.
-- The smallest production change needed.
+Keep the production change minimal.
 
-Do not implement the fix yet.
 
 
 
