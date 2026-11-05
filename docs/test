@@ -1,35 +1,51 @@
 
-Complete the remaining legacy listener
-configuration integration.
+Perform a final end-to-end configuration migration
+audit across the entire multi-module project.
 
-Focus on:
-- Multi-app orchestration listeners
-- EmailReport
-- Any remaining active legacy configuration paths
+The hierarchical configuration engine and
+production listeners are now integrated.
 
-Requirements:
+Goals:
+1. Identify all remaining legacy configuration
+   loading and storage paths.
+2. Verify that BaseSuite no longer duplicates
+   configuration loading already performed by
+   the lifecycle adapter.
+3. Verify that PropertiesManager uses the new
+   engine throughout an active execution.
+4. Verify that all listeners and services receive
+   the correct scope, including parallel tests,
+   retries, skips and execution-finish reporting.
+5. Verify there is exactly one configuration
+   owner per TestNG execution.
+6. Check module dependencies for cycles and
+   unnecessary test dependencies.
 
-1. Preserve all public APIs and existing behavior.
-2. Preserve BaseSuite setup/teardown execution.
-3. Use the correct writable lifecycle scope for
-   configuration mutations.
-4. Use immutable captured snapshots for reporting
-   after context cleanup.
-5. Do not silently redirect writes to ThreadLocal.
-6. Do not reactivate released contexts.
-7. Avoid duplicate configuration loading.
-8. Preserve listener ordering independence.
-9. Support parallel suites, tests and retries.
-10. Keep core independent of TestNG.
-11. Do not introduce global mutable state.
+Preserve:
+- All existing public APIs and method signatures.
+- Existing consumer test classes.
+- Legacy behavior when the new adapter is absent.
+- Centralized listener coordination.
+- Framework-independent core.
+- Thread safety and configuration isolation.
 
-Add integration tests covering the real listener
-hierarchies, not only simulated callbacks.
+Do not remove the legacy ThreadLocal yet.
+
+If duplicate loading is confirmed, remove only
+the redundant execution paths while preserving
+the existing public methods.
+
+Add or update real integration tests as needed.
 
 Run the complete Maven reactor.
 
-Report any configuration reads or writes that
-still depend on the legacy ThreadLocal.
+Report:
+- Remaining legacy configuration dependencies
+- Redundant BaseSuite initialization paths
+- Any compatibility risks
+- Exact test results
+- Whether the old storage can safely be retired
+
 
 
 
