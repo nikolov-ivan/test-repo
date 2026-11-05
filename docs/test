@@ -1,23 +1,36 @@
 
-Proceed with option A.
+Complete the remaining legacy listener
+configuration integration.
 
-Use a centralized, scoped read-only configuration
-binding in core, activated by the TestNG adapter.
+Focus on:
+- Multi-app orchestration listeners
+- EmailReport
+- Any remaining active legacy configuration paths
 
-Preserve all existing PropertiesManager APIs and
-avoid changing individual service implementations.
+Requirements:
 
-Ensure:
-- try-with-resources cleanup
-- nested and parallel callback isolation
-- explicit failure on writes in read-only scope
-- correct context selection for each callback
-- no fallback to an unrelated context
-- no access to released invocation contexts
-- immutable captured snapshots for deferred reporting
+1. Preserve all public APIs and existing behavior.
+2. Preserve BaseSuite setup/teardown execution.
+3. Use the correct writable lifecycle scope for
+   configuration mutations.
+4. Use immutable captured snapshots for reporting
+   after context cleanup.
+5. Do not silently redirect writes to ThreadLocal.
+6. Do not reactivate released contexts.
+7. Avoid duplicate configuration loading.
+8. Preserve listener ordering independence.
+9. Support parallel suites, tests and retries.
+10. Keep core independent of TestNG.
+11. Do not introduce global mutable state.
 
-Test the complete lifecycle before migrating
-all listeners.
+Add integration tests covering the real listener
+hierarchies, not only simulated callbacks.
+
+Run the complete Maven reactor.
+
+Report any configuration reads or writes that
+still depend on the legacy ThreadLocal.
+
 
 
 
