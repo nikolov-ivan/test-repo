@@ -1,50 +1,34 @@
+Verify that the new TestNG lifecycle adapter is
+automatically activated in every supported TestNG execution.
 
-Perform a final end-to-end configuration migration
-audit across the entire multi-module project.
+1. Inspect how the lifecycle adapter is registered.
+2. Verify automatic discovery without explicit
+   @Listeners annotations or testng.xml registration.
+3. Create an integration test simulating a real
+   external consumer project.
+4. Verify configuration availability in:
+   - @BeforeSuite
+   - @BeforeTest
+   - @BeforeClass
+   - @BeforeMethod
+   - @Test
+5. Verify correct SUITE, TEST, CLASS and INVOCATION
+   configuration resolution.
+6. Verify parallel execution, retries and cleanup.
+7. Verify BaseSuite does not duplicate configuration
+   loading when the adapter is active.
+8. Verify the adapter is initialized exactly once
+   per TestNG execution.
+9. Verify existing BaseSuite subclasses continue
+   working without changes.
 
-The hierarchical configuration engine and
-production listeners are now integrated.
+Do not modify production code yet.
 
-Goals:
-1. Identify all remaining legacy configuration
-   loading and storage paths.
-2. Verify that BaseSuite no longer duplicates
-   configuration loading already performed by
-   the lifecycle adapter.
-3. Verify that PropertiesManager uses the new
-   engine throughout an active execution.
-4. Verify that all listeners and services receive
-   the correct scope, including parallel tests,
-   retries, skips and execution-finish reporting.
-5. Verify there is exactly one configuration
-   owner per TestNG execution.
-6. Check module dependencies for cycles and
-   unnecessary test dependencies.
+Run the integration tests and full Maven reactor.
 
-Preserve:
-- All existing public APIs and method signatures.
-- Existing consumer test classes.
-- Legacy behavior when the new adapter is absent.
-- Centralized listener coordination.
-- Framework-independent core.
-- Thread safety and configuration isolation.
-
-Do not remove the legacy ThreadLocal yet.
-
-If duplicate loading is confirmed, remove only
-the redundant execution paths while preserving
-the existing public methods.
-
-Add or update real integration tests as needed.
-
-Run the complete Maven reactor.
-
-Report:
-- Remaining legacy configuration dependencies
-- Redundant BaseSuite initialization paths
-- Any compatibility risks
-- Exact test results
-- Whether the old storage can safely be retired
+Report whether configuration loading can be
+completely removed from BaseSuite without
+breaking existing consumers.
 
 
 
