@@ -1,33 +1,24 @@
 
-Migrate JiraAnnotationListener to the new
-hierarchical configuration system.
+Proceed with option A.
 
-Goals:
-- Preserve all existing public APIs.
-- Preserve existing Jira reporting behavior.
-- Remove reliance on legacy ThreadLocal
-  configuration when the new engine is active.
-- Resolve configuration from the correct
-  TestNG lifecycle context.
-- Support independently registered listeners.
-- Do not depend on listener execution order.
-- Do not silently fall back to ROOT when
-  invocation-specific configuration is required.
-- Preserve exception handling and cleanup.
-- Support parallel execution, retries and skips.
-- Keep core independent of TestNG.
+Use a centralized, scoped read-only configuration
+binding in core, activated by the TestNG adapter.
 
-Reuse the existing configuration access mechanism.
-Do not introduce new global state or another
-configuration store.
+Preserve all existing PropertiesManager APIs and
+avoid changing individual service implementations.
 
-Add real TestNG 7.12.0 integration tests that
-verify listener behavior and configuration
-isolation.
+Ensure:
+- try-with-resources cleanup
+- nested and parallel callback isolation
+- explicit failure on writes in read-only scope
+- correct context selection for each callback
+- no fallback to an unrelated context
+- no access to released invocation contexts
+- immutable captured snapshots for deferred reporting
 
-Run the affected tests and full Maven reactor.
+Test the complete lifecycle before migrating
+all listeners.
 
-Report exact changes and results.
 
 
 
